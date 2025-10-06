@@ -21,7 +21,7 @@ export default function Hero() {
           <div className="relative group">
             <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border border-white/10 shadow-2xl bg-[#1d1d1f] transition-transform duration-500 group-hover:scale-105">
               <Image
-                src="/images/profile.jpeg"
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/profile.jpeg`}
                 alt={personalInfo.name}
                 fill
                 className="object-cover scale-[1.25]"
