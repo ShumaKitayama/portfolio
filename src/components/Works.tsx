@@ -7,6 +7,7 @@ export default function Works() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "公開中":
+      case "運用中 (Demo)":
         return "bg-[#30d158]/20 text-[#30d158] border-[#30d158]/30";
       case "実店舗導入済み":
         return "bg-[#0a84ff]/20 text-[#0a84ff] border-[#0a84ff]/30";
