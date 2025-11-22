@@ -77,6 +77,7 @@ export const works = [
     description:
       "大学の友人からの依頼で学内ドリンクバーサービスのポータルサイトを開発。サブスク決済実装に苦労し、Stripe との安全な連携を実現。「Stripe 上にユーザー作成 → フロントから直接カード登録 → バックエンドで紐付け」という安全なフローで対応。2025 年 12 月より学内運用予定。Cloudflare 設定調整中。",
     status: "運用予定",
+    url: "https://juiceacademydemo.win",
   },
   {
     title: "ぼきゃぶらりんぐ",
