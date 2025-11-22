@@ -73,9 +73,19 @@ export const achievements = [
 export const works = [
   {
     title: "Juice 学園 ポータルサイト",
-    tech: ["TypeScript", "React", "Go", "Gin", "MongoDB", "Redis", "Cloudflare", "Docker"],
+    tech: [
+      "TypeScript",
+      "React",
+      "Go",
+      "Gin",
+      "MongoDB",
+      "Redis",
+      "Docker",
+      "Cloudflare",
+      "Stripe",
+    ],
     description:
-      "大学の友人からの依頼で学内ドリンクバーサービスのポータルサイトを開発。サブスク決済実装に苦労し、Stripe との安全な連携を実現。「Stripe 上にユーザー作成 → フロントから直接カード登録 → バックエンドで紐付け」という安全なフローで対応。2025 年 12 月より学内運用予定。Cloudflare 設定調整中。",
+      "大学内ドリンクバーサービスのポータルサイト。友人の起業を技術面からフルサポート。低スペック環境での運用を前提に、JOIN排除・非同期処理・Redisキャッシュ活用で負荷を徹底的に分散。認証はJWTとGmail APIを用いた2要素認証(OTP)で堅牢化。決済はStripeと連携し、Webhookの署名検証・冪等性管理によりデータの整合性を担保。IDOR/CSRF対策や個人情報のマスキングログ、Docker非root実行など、セキュリティと運用性にも注力した設計。",
     status: "運用中 (Demo)",
     url: "https://juiceacademydemo.win",
   },
