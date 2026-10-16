@@ -1,73 +1,47 @@
-"use client";
-
 import { socialLinks } from "@/data/portfolio";
-import { FaGithub, FaInstagram, FaTwitter } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { SiQiita } from "react-icons/si";
+import { SectionHeader } from "./ui";
 
 export default function Contact() {
   const links = [
-    {
-      name: "X (Twitter)",
-      url: socialLinks.twitter,
-      icon: FaTwitter,
-      hoverColor: "#1da1f2",
-    },
-    {
-      name: "Instagram",
-      url: socialLinks.instagram,
-      icon: FaInstagram,
-      hoverColor: "#e1306c",
-    },
-    { name: "GitHub", url: socialLinks.github, icon: FaGithub, hoverColor: "#86868b" },
-    { name: "Qiita", url: socialLinks.qiita, icon: SiQiita, hoverColor: "#55c500" },
+    { name: "X", handle: "@2005_helloworld", url: socialLinks.twitter, icon: FaXTwitter },
+    { name: "GitHub", handle: "Shumakitayama", url: socialLinks.github, icon: FaGithub },
+    { name: "Qiita", handle: "baningugozira", url: socialLinks.qiita, icon: SiQiita },
   ];
 
   return (
-    <section id="contact" className="py-24 md:py-32 px-6 bg-black">
-      <div className="max-w-[980px] mx-auto text-center">
-        {/* セクションタイトル */}
-        <h2 className="text-[48px] md:text-[64px] font-semibold text-center mb-4 leading-[1.08] tracking-[-0.003em] gradient-text">
-          メディア・連絡先
-        </h2>
-        <p className="text-center text-[21px] mb-12 md:mb-16 leading-[1.381] tracking-[-0.022em] gradient-purple">
-          お気軽にご連絡ください
-        </p>
+    <section id="contact" className="pt-24 md:pt-32 pb-12 px-4 md:px-8">
+      <div className="max-w-[1120px] mx-auto">
+        <SectionHeader index="06" label="CONTACT" title="連絡先" lead="お気軽にご連絡ください。" />
 
-        {/* SNSリンク */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-20">
-          {links.map((link, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+          {links.map((link) => (
             <a
-              key={idx}
+              key={link.name}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="apple-card p-8 flex flex-col items-center gap-4 hover:border-white/10 group transition-all duration-300 social-link"
+              className="window window-hover p-5 md:p-6 flex flex-col gap-6 group"
             >
-              <link.icon
-                size={40}
-                className="text-[#a1a1a6] group-hover:scale-110 transition-colors duration-300 social-icon"
-                style={
-                  {
-                    "--icon-hover-color": link.hoverColor,
-                  } as React.CSSProperties
-                }
-              />
-              <span className="text-[15px] font-medium text-[#a1a1a6] group-hover:text-[#f5f5f7] transition-colors duration-300 tracking-[-0.022em]">
-                {link.name}
+              <span className="w-11 h-11 rounded-full bg-ink text-white flex items-center justify-center transition-shadow group-hover:shadow-[0_0_0_4px_var(--laser)]">
+                <link.icon size={20} />
+              </span>
+              <span>
+                <span className="block text-[18px] font-extrabold tracking-[-0.03em]">
+                  {link.name} <span aria-hidden>›</span>
+                </span>
+                <span className="mono text-muted break-all">{link.handle}</span>
               </span>
             </a>
           ))}
         </div>
 
-        {/* フッター */}
-        <div className="border-t border-white/5 pt-12">
-          <p className="text-[14px] text-[#a1a1a6] mb-2 tracking-[-0.022em]">
-            © 2025 Kitayama Shuma. All rights reserved.
-          </p>
-          <p className="text-[12px] text-[#a1a1a6] tracking-[-0.022em]">
-            Made with Next.js & TypeScript
-          </p>
-        </div>
+        <footer className="mt-24 pt-6 border-t-2 border-stone flex flex-wrap justify-between gap-2">
+          <p className="mono text-muted">© {new Date().getFullYear()} Kitayama Shuma</p>
+          <p className="mono text-muted">Made with Next.js & TypeScript</p>
+        </footer>
       </div>
     </section>
   );

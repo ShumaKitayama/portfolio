@@ -1,25 +1,66 @@
 "use client";
 
-import { personalInfo } from "@/data/portfolio";
+import { personalInfo, works } from "@/data/portfolio";
 import Image from "next/image";
-import { FaChevronDown } from "react-icons/fa";
+import { CdCover, CdDisc, catalogNo, yearOf } from "./Cd";
+
+// 扇に並べる 3 枚（中央が最新作）
+const featured = [works[1], works[0], works[3]].map((work) => ({ work, index: works.indexOf(work) }));
 
 export default function Hero() {
-  const scrollToAbout = () => {
-    document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToWorks = () => {
+    const element = document.getElementById("works");
+    if (element) {
+      window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 88, behavior: "smooth" });
+    }
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-black">
-      {/* シンプルな背景グラデーション */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(30,30,30,1)_0%,_rgba(0,0,0,1)_100%)]" />
+    <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-4 pt-28 pb-16">
+      <div className="absolute inset-0 grid-bg" aria-hidden />
 
-      {/* コンテンツ */}
-      <div className="relative z-10 text-center px-6 max-w-[980px] mx-auto">
-        {/* プロフィール画像 */}
-        <div className="flex justify-center mb-12 opacity-0 animate-[fadeInUp_1s_ease-out_0.2s_forwards]">
-          <div className="relative group">
-            <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border border-white/10 shadow-2xl bg-[#1d1d1f] transition-transform duration-500 group-hover:scale-105">
+      {/* CD ジャケットの扇（主役のオブジェクト） */}
+      <button
+        onClick={scrollToWorks}
+        className="group relative w-[min(78vw,460px)] aspect-[1.5/1] rise"
+        style={{ animationDelay: "0.1s" }}
+        aria-label="制作物を見る"
+      >
+        {featured.map(({ work, index }, i) => {
+          const offset = i - 1; // -1, 0, 1
+          return (
+            <span
+              key={work.title}
+              className="absolute top-[6%] left-1/2 h-[88%] aspect-square transition-transform duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+              style={{
+                zIndex: i === 1 ? 3 : 1,
+                transform: `translateX(calc(-50% + ${offset * 34}%)) rotate(${offset * 8}deg) translateY(${Math.abs(offset) * 6}%)`,
+              }}
+            >
+              <span className="absolute inset-[4%] -translate-y-[12%] transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-[34%]">
+                <CdDisc label={work.cover.bg} />
+              </span>
+              <span className="absolute inset-0">
+                <CdCover cover={work.cover} catalog={catalogNo(index)} year={yearOf(work.period)} />
+              </span>
+            </span>
+          );
+        })}
+      </button>
+
+      {/* ウィンドウカード */}
+      <div className="relative mt-[30px] rise" style={{ animationDelay: "0.35s" }}>
+        <div className="window w-[min(92vw,420px)]">
+          <div className="window-bar">
+            <div className="traffic" aria-hidden>
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className="mono text-muted">kitayama-lab.app</div>
+          </div>
+          <div className="p-5 md:p-6 flex items-center gap-4">
+            <div className="relative w-16 h-16 md:w-[72px] md:h-[72px] rounded-full overflow-hidden flex-shrink-0 ring-2 ring-laser ring-offset-2">
               <Image
                 src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/profile.jpeg`}
                 alt={personalInfo.name}
@@ -29,31 +70,26 @@ export default function Hero() {
                 priority
               />
             </div>
+            <div className="min-w-0">
+              <h1 className="text-[28px] md:text-[32px] font-extrabold leading-[1.1] tracking-[-0.036em]">
+                Kitayama Lab
+              </h1>
+              <p className="mt-1 text-[14px] font-bold text-muted">
+                {personalInfo.name} · SRE / Backend / 強化学習
+              </p>
+            </div>
+          </div>
+          <div className="px-5 md:px-6 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
+            <button onClick={scrollToWorks} className="btn">
+              制作物を見る <span aria-hidden>›</span>
+            </button>
+            <span className="mono text-muted flex items-center gap-2 ml-auto">
+              <span className="laser-dot" />
+              NOW @ ZOZO SRE
+            </span>
           </div>
         </div>
-
-        {/* メインテキスト */}
-        <h1 className="text-[56px] md:text-[80px] lg:text-[96px] font-semibold mb-6 leading-[1.05] tracking-[-0.015em] opacity-0 animate-[fadeInUp_1s_ease-out_0.4s_forwards] gradient-text">
-          Kitayama Lab
-        </h1>
-
-        <p className="text-[21px] md:text-[24px] text-[#f5f5f7] mb-3 font-normal leading-[1.4] tracking-[-0.022em] opacity-0 animate-[fadeInUp_1s_ease-out_0.6s_forwards]">
-          {personalInfo.title} · {personalInfo.name}
-        </p>
-
-        <p className="text-[17px] md:text-[19px] text-[#a1a1a6] max-w-[690px] mx-auto font-normal leading-[1.47] tracking-[-0.022em] opacity-0 animate-[fadeInUp_1s_ease-out_0.8s_forwards]">
-          {personalInfo.description}
-        </p>
       </div>
-
-      {/* スクロールダウンインジケーター */}
-      <button
-        onClick={scrollToAbout}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 text-[#a1a1a6] hover:text-[#f5f5f7] transition-all duration-300 animate-bounce cursor-pointer opacity-60 hover:opacity-100"
-        aria-label="スクロールダウン"
-      >
-        <FaChevronDown size={24} />
-      </button>
     </section>
   );
 }

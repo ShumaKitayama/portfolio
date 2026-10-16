@@ -1,78 +1,93 @@
-"use client";
-
-import { personalInfo } from "@/data/portfolio";
+import { achievements, careers, personalInfo, works } from "@/data/portfolio";
+import Image from "next/image";
+import { PlayingBars } from "./Cd";
+import { SectionHeader } from "./ui";
 
 export default function About() {
-  const infoItems = [
-    { label: "名前", value: personalInfo.name },
-    { label: "年齢", value: `${personalInfo.age} 歳` },
-    { label: "出身", value: personalInfo.location },
+  const stats = [
+    { value: careers.length, unit: "社", label: "職歴" },
+    { value: works.length, unit: "作", label: "制作物" },
+    { value: achievements.length, unit: "回", label: "受賞" },
   ];
 
   return (
-    <section id="about" className="py-24 md:py-32 px-6 bg-black">
-      <div className="max-w-[980px] mx-auto">
-        {/* セクションタイトル */}
-        <h2 className="text-[48px] md:text-[64px] font-semibold text-center mb-4 leading-[1.08] tracking-[-0.003em] gradient-text">
-          自己紹介
-        </h2>
-        <p className="text-center text-[21px] mb-16 md:mb-20 leading-[1.381] tracking-[-0.022em] gradient-purple">
-          About Me
-        </p>
+    <section id="about" className="py-24 md:py-32 px-4 md:px-8">
+      <div className="max-w-[1120px] mx-auto">
+        <SectionHeader index="01" label="ARTIST PROFILE" title="自己紹介" />
 
-        {/* 基本情報 */}
-        <div className="grid md:grid-cols-3 gap-6 mb-20">
-          {infoItems.map((item, idx) => (
-            <div
-              key={idx}
-              className="apple-card p-8 text-center hover:border-white/10 transition-all duration-400"
-            >
-              <p className="text-[14px] text-[#a1a1a6] mb-2 uppercase tracking-wide">
-                {item.label}
-              </p>
-              <p className="text-[28px] font-semibold text-[#f5f5f7] tracking-[-0.022em]">
-                {item.value}
-              </p>
+        <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 md:gap-12 items-start">
+          {/* アーティスト写真 + ステッカー */}
+          <div className="relative max-w-[440px] w-full mx-auto md:mx-0">
+            {/* ピクチャーディスク */}
+            <div className="picture-disc relative aspect-square rounded-full">
+              <div className="absolute inset-[3.5%] rounded-full overflow-hidden bg-canvas">
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/profile.jpeg`}
+                  alt={personalInfo.name}
+                  fill
+                  className="object-cover scale-[1.3]"
+                  style={{ objectPosition: "center 52%" }}
+                />
+              </div>
             </div>
-          ))}
-        </div>
+            <div className="mt-6 text-center md:text-left">
+              <p className="mono text-muted">ARTIST</p>
+              <p className="text-[24px] font-extrabold tracking-[-0.036em]">{personalInfo.nameEn}</p>
+            </div>
+            <span className="sticker absolute -top-4 -right-3 rotate-[8deg] bg-laser">{personalInfo.age} 歳</span>
+            <span className="sticker absolute top-[38%] -left-4 rotate-[-7deg] bg-[#ffd400]">
+              {personalInfo.location}出身
+            </span>
+            <span className="sticker absolute top-[72%] -right-2 rotate-[-4deg] bg-ink !text-white flex items-center gap-2">
+              <PlayingBars /> NOW @ ZOZO SRE
+            </span>
+          </div>
 
-        {/* メインコンテンツ */}
-        <div className="space-y-12">
-          {/* プロフィール */}
-          <div className="apple-card p-10 md:p-12">
-            <h3 className="text-[24px] font-semibold mb-6 text-[#f5f5f7] tracking-[-0.022em]">
-              プロフィール
+          {/* プロフィール本文 */}
+          <div className="min-w-0 pt-4 md:pt-0">
+            <h3 className="text-[44px] md:text-[64px] font-extrabold tracking-[-0.045em] leading-[1]">
+              {personalInfo.name}
             </h3>
-            <p className="text-[17px] text-[#a1a1a6] leading-[1.47] tracking-[-0.022em] mb-4">
-              {personalInfo.description}
-            </p>
-            <p className="text-[17px] text-[#a1a1a6] leading-[1.47] tracking-[-0.022em]">
+            <p className="mono text-muted mt-3">{personalInfo.title.toUpperCase()} / SRE · BACKEND · 強化学習</p>
+
+            <p className="mt-6 text-[17px] md:text-[19px] font-bold prose-ja">{personalInfo.description}</p>
+            <p className="mt-3 text-[15px] font-medium text-muted prose-ja">
               徳島に来たら{" "}
               <a
                 href="https://www.instagram.com/eureka_tokushimacoworking?igsh=MWVybmJveHp5czFqeQ=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#0071e3] hover:underline transition-all duration-300"
+                className="font-extrabold text-ink marker hover:bg-laser"
               >
                 Eureka
               </a>{" "}
               もぜひ利用してみてください。
             </p>
-          </div>
 
-          {/* 座右の銘 */}
-          <div className="apple-card p-10 md:p-12">
-            <h3 className="text-[24px] font-semibold mb-6 text-[#f5f5f7] tracking-[-0.022em]">
-              座右の銘
-            </h3>
-            <p className="text-[32px] md:text-[40px] font-semibold mb-6 text-[#f5f5f7] leading-[1.1] tracking-[-0.003em]">
-              「{personalInfo.motto}」
-            </p>
-            <p className="text-[17px] text-[#a1a1a6] leading-[1.47] tracking-[-0.022em]">
-              実は星のカービィシリーズのカービィちゃんも同じ座右の銘なんですよ。
-              とっても嬉しい。まぁそれを知ってから座右の銘にしたんですけどね。
-            </p>
+            {/* 数字 */}
+            <div className="mt-8 grid grid-cols-3 border-y-2 border-ink">
+              {stats.map((stat, i) => (
+                <div key={stat.label} className={`py-4 ${i > 0 ? "pl-4 border-l-2 border-stone" : ""}`}>
+                  <p className="text-[36px] md:text-[48px] font-extrabold tracking-[-0.045em] leading-none">
+                    {stat.value}
+                    <span className="text-[16px] md:text-[18px] ml-1">{stat.unit}</span>
+                  </p>
+                  <p className="mono text-muted mt-2">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* 座右の銘 */}
+            <div className="mt-8">
+              <p className="mono text-muted mb-3">MOTTO</p>
+              <p className="text-[28px] md:text-[40px] font-extrabold leading-[1.2] tracking-[-0.04em]">
+                「<span className="marker">{personalInfo.motto}</span>」
+              </p>
+              <p className="mt-3 text-[15px] font-medium text-muted prose-ja">
+                実は星のカービィシリーズのカービィちゃんも同じ座右の銘なんですよ。
+                とっても嬉しい。まぁそれを知ってから座右の銘にしたんですけどね。
+              </p>
+            </div>
           </div>
         </div>
       </div>
