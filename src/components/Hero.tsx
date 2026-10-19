@@ -2,10 +2,11 @@
 
 import { personalInfo, works } from "@/data/portfolio";
 import Image from "next/image";
-import { CdCover, CdDisc, catalogNo, yearOf } from "./Cd";
+import AccentMixer from "./AccentMixer";
+import { Garment } from "./Garment";
 
-// 扇に並べる 3 枚（中央が最新作）
-const featured = [works[1], works[0], works[3]].map((work) => ({ work, index: works.indexOf(work) }));
+// ラックに掛ける 3 着（中央が最新作）
+const featured = [works[1], works[0], works[3]].map((work) => ({ work }));
 
 export default function Hero() {
   const scrollToWorks = () => {
@@ -19,33 +20,25 @@ export default function Hero() {
     <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-4 pt-28 pb-16">
       <div className="absolute inset-0 grid-bg" aria-hidden />
 
-      {/* CD ジャケットの扇（主役のオブジェクト） */}
+      {/* 小さなハンガーラック（主役のオブジェクト） */}
       <button
         onClick={scrollToWorks}
-        className="group relative w-[min(78vw,460px)] aspect-[1.5/1] rise"
+        className="group relative w-[min(88vw,520px)] rise"
         style={{ animationDelay: "0.1s" }}
         aria-label="制作物を見る"
       >
-        {featured.map(({ work, index }, i) => {
-          const offset = i - 1; // -1, 0, 1
-          return (
+        <span className="rack-bar block mx-[4%]" aria-hidden />
+        <span className="grid grid-cols-3 gap-[3%] px-[6%]">
+          {featured.map(({ work }, i) => (
             <span
               key={work.title}
-              className="absolute top-[6%] left-1/2 h-[88%] aspect-square transition-transform duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
-              style={{
-                zIndex: i === 1 ? 3 : 1,
-                transform: `translateX(calc(-50% + ${offset * 34}%)) rotate(${offset * 8}deg) translateY(${Math.abs(offset) * 6}%)`,
-              }}
+              className="hero-hanger block"
+              style={{ "--i": i } as React.CSSProperties}
             >
-              <span className="absolute inset-[4%] -translate-y-[12%] transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-[34%]">
-                <CdDisc label={work.cover.bg} />
-              </span>
-              <span className="absolute inset-0">
-                <CdCover cover={work.cover} catalog={catalogNo(index)} year={yearOf(work.period)} />
-              </span>
+              <Garment cover={work.cover} />
             </span>
-          );
-        })}
+          ))}
+        </span>
       </button>
 
       {/* ウィンドウカード */}
@@ -60,13 +53,14 @@ export default function Hero() {
             <div className="mono text-muted">kitayama-lab.app</div>
           </div>
           <div className="p-5 md:p-6 flex items-center gap-4">
-            <div className="relative w-16 h-16 md:w-[72px] md:h-[72px] rounded-full overflow-hidden flex-shrink-0 ring-2 ring-laser ring-offset-2">
+            <div className="relative w-16 h-16 md:w-[72px] md:h-[72px] rounded-full overflow-hidden flex-shrink-0 ring-2 ring-laser ring-offset-2 ring-offset-surface">
               <Image
-                src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/profile.jpeg`}
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/avatar.jpg`}
                 alt={personalInfo.name}
                 fill
-                className="object-cover scale-[1.25]"
-                style={{ objectPosition: "center 53%" }}
+                className="object-cover scale-[2.1]"
+                // 小さいアイコンなので顔のあたりを拡大する
+                style={{ transformOrigin: "33% 30%" }}
                 priority
               />
             </div>
@@ -88,8 +82,24 @@ export default function Hero() {
               NOW @ ZOZO SRE
             </span>
           </div>
+          {/* カラーバリエーション：サイト全体のアクセント色を変えられる */}
+          <div className="px-5 md:px-6 py-3 border-t-2 border-stone flex items-center justify-between gap-3">
+            <span className="mono text-muted">COLOR</span>
+            <AccentMixer />
+          </div>
         </div>
       </div>
+
+      {/* スクロール誘導 */}
+      <button
+        onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
+        className="scroll-cue mt-10 rise"
+        style={{ animationDelay: "0.6s" }}
+        aria-label="自己紹介へスクロール"
+      >
+        <span className="mono text-muted">SCROLL</span>
+        <span className="scroll-cue-line" aria-hidden />
+      </button>
     </section>
   );
 }

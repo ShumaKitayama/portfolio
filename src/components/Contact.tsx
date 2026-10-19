@@ -17,15 +17,17 @@ export default function Contact() {
         <SectionHeader index="06" label="CONTACT" title="連絡先" lead="お気軽にご連絡ください。" />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
-          {links.map((link) => (
+          {links.map((link, i) => (
             <a
               key={link.name}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
               className="window window-hover p-5 md:p-6 flex flex-col gap-6 group"
+              data-reveal="pop"
+              style={{ "--d": `${i * 100}ms` } as React.CSSProperties}
             >
-              <span className="w-11 h-11 rounded-full bg-ink text-white flex items-center justify-center transition-shadow group-hover:shadow-[0_0_0_4px_var(--laser)]">
+              <span className="w-11 h-11 rounded-full bg-ink text-on-ink flex items-center justify-center transition-shadow group-hover:shadow-[0_0_0_4px_var(--laser)]">
                 <link.icon size={20} />
               </span>
               <span>
@@ -38,7 +40,19 @@ export default function Contact() {
           ))}
         </div>
 
-        <footer className="mt-24 pt-6 border-t-2 border-stone flex flex-wrap justify-between gap-2">
+        {/* エンディング */}
+        <div className="mt-28 text-center" data-reveal>
+          <p className="mono text-muted mb-4 flex items-center justify-center gap-2">
+            <span className="laser-dot" />
+            END OF COLLECTION
+          </p>
+          <p className="text-[40px] md:text-[80px] font-extrabold tracking-[-0.05em] leading-[1]">
+            Thank you for <span className="marker">visiting!</span>
+          </p>
+          <p className="mt-5 text-[15px] font-bold text-muted">最後まで見てくださり、ありがとうございました。</p>
+        </div>
+
+        <footer className="mt-20 pt-6 border-t-2 border-stone flex flex-wrap justify-between gap-2">
           <p className="mono text-muted">© {new Date().getFullYear()} Kitayama Shuma</p>
           <p className="mono text-muted">Made with Next.js & TypeScript</p>
         </footer>

@@ -56,7 +56,7 @@ export default function Navigation() {
               key={item.id}
               onClick={() => scrollToSection(item.id)}
               className={`px-3 py-2 rounded-[20px] text-[12px] font-extrabold whitespace-nowrap transition-colors duration-200 ${
-                activeSection === item.id ? "bg-ink text-white" : "text-muted hover:text-ink"
+                activeSection === item.id ? "bg-ink text-on-ink" : "text-muted hover:text-ink"
               }`}
             >
               {item.label}

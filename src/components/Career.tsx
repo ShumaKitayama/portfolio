@@ -1,16 +1,25 @@
 import { careers, education, type Role } from "@/data/portfolio";
-import { PlayingBars } from "./Cd";
 import { SectionHeader, Tags } from "./ui";
 
-const sideLetter = (i: number) => String.fromCharCode(65 + i); // A, B, C...
+const lookNo = (i: number) => `LOOK ${String(i + 1).padStart(2, "0")}`;
+
+// 開始月からシーズン表記を作る（3〜8 月 = SS、9〜2 月 = AW）
+function seasonOf(period: string) {
+  const match = period.match(/(\d{4}) 年 (\d{1,2}) 月/);
+  if (!match) return "";
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  if (month >= 3 && month <= 8) return `${String(year).slice(2)}SS`;
+  return `${String(month <= 2 ? year - 1 : year).slice(2)}AW`;
+}
 
 function RoleBlock({ role, side }: { role: Role; side: string }) {
   return (
-    <div className="grid grid-cols-[36px_1fr] gap-3 py-5 border-t-2 border-stone first:border-t-0 first:pt-0">
-      <span className="mono text-muted pt-[3px]">{side}</span>
+    <div className="py-6 border-t-2 border-stone first:border-t-0 first:pt-2">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-2">
-          <span className="tag !bg-ink !text-white !border-ink">{role.type}</span>
+          <span className="mono text-muted mr-1">{side}</span>
+          <span className="tag !bg-ink !text-on-ink !border-ink">{role.type}</span>
           {role.team && <span className="tag">{role.team}</span>}
           <span className="mono text-muted">{role.period}</span>
         </div>
@@ -45,32 +54,30 @@ export default function Career() {
       <div className="max-w-[1120px] mx-auto">
         <SectionHeader
           index="02"
-          label="TRACKLIST"
+          label="COLLECTION ARCHIVE"
           title="職歴"
-          lead="インターン・アルバイトで、フロントエンドから SRE まで実務を経験してきました。曲名を選ぶと詳細が開きます。"
+          lead="インターン・アルバイトで、フロントエンドから SRE まで実務を経験してきました。シーズンごとのコレクションのように並べています。選ぶと詳細が開きます。"
         />
 
-        <div className="window overflow-hidden">
+        <div className="window overflow-hidden" data-reveal>
           <div className="window-bar">
             <div className="traffic" aria-hidden>
               <span />
               <span />
               <span />
             </div>
-            <div className="mono text-muted">career.m3u — {careers.length} tracks</div>
+            <div className="mono text-muted">collection-archive — {careers.length} brands</div>
           </div>
 
           <ol>
             {careers.map((career, index) => (
               <li key={career.company} className="border-t-2 border-stone first:border-t-0">
                 <details className="group/track" open={index === 0}>
-                  <summary className="track-row grid grid-cols-[44px_1fr_auto] md:grid-cols-[64px_1fr_auto_24px] items-center gap-3 md:gap-5 px-5 md:px-8 py-5 md:py-6">
+                  <summary className="track-row grid grid-cols-[52px_1fr_auto] md:grid-cols-[72px_1fr_auto_24px] items-center gap-3 md:gap-5 px-5 md:px-8 py-5 md:py-6">
                     <span className="flex items-center">
-                      {career.current ? (
-                        <PlayingBars />
-                      ) : (
-                        <span className="mono text-[14px] text-muted">{String(index + 1).padStart(2, "0")}</span>
-                      )}
+                      <span className={`season-badge ${career.current ? "is-new" : ""}`}>
+                        {career.current ? "NEW" : seasonOf(career.period)}
+                      </span>
                     </span>
                     <span className="min-w-0">
                       <span className="block text-[20px] md:text-[28px] font-extrabold tracking-[-0.036em] leading-[1.2]">
@@ -88,9 +95,9 @@ export default function Career() {
                     </span>
                   </summary>
 
-                  <div className="px-5 md:px-8 pb-8 md:pl-[116px]">
+                  <div className="px-5 md:px-8 pb-8">
                     {career.roles.map((role, i) => (
-                      <RoleBlock key={i} role={role} side={sideLetter(i)} />
+                      <RoleBlock key={i} role={role} side={lookNo(i)} />
                     ))}
                     {career.tech && (
                       <div className="mt-5 pt-5 border-t-2 border-stone">
@@ -104,19 +111,44 @@ export default function Career() {
           </ol>
         </div>
 
-        {/* 学歴：B 面 */}
-        <div className="mt-12">
-          <p className="mono text-muted mb-5">B-SIDE / EDUCATION</p>
-          <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {education.map((item, i) => (
-              <li key={item.date} className="window p-5">
-                <p className="mono text-muted mb-2">
-                  B{i + 1} · {item.date}
-                </p>
-                <p className="text-[15px] font-bold prose-ja">{item.event}</p>
-              </li>
-            ))}
-          </ol>
+        {/* 学歴：縦のツリー（職歴と同じ大きさのウィンドウで見せる） */}
+        <div className="mt-16">
+          <h3 className="text-[32px] md:text-[48px] font-extrabold tracking-[-0.045em] leading-[1.1] mb-6" data-reveal="left">
+            学歴
+          </h3>
+          <div className="window" data-reveal>
+            <div className="window-bar">
+              <div className="traffic" aria-hidden>
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="mono text-muted">education.log — {education.length} entries</div>
+            </div>
+            <ol className="edu-tree px-5 md:px-8 py-8 md:py-10">
+              {education.map((item, i) => {
+                const isNow = i === education.length - 1;
+                return (
+                  <li
+                    key={item.date}
+                    className="edu-node"
+                    data-reveal="left"
+                    style={{ "--d": `${i * 110}ms` } as React.CSSProperties}
+                  >
+                    <span className={`edu-dot ${isNow ? "is-now" : ""}`} aria-hidden />
+                    <div className="grid md:grid-cols-[200px_1fr] gap-2 md:gap-8 items-baseline">
+                      <p className={`mono !text-[14px] md:!text-[16px] ${isNow ? "text-ink" : "text-muted"}`}>
+                        {item.date}
+                      </p>
+                      <p className="text-[20px] md:text-[28px] font-extrabold tracking-[-0.036em] leading-[1.35]">
+                        {isNow ? <span className="marker">{item.event}</span> : item.event}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </div>
       </div>
     </section>

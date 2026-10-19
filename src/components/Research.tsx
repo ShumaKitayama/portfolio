@@ -1,24 +1,39 @@
 import { research } from "@/data/portfolio";
-import { CdCover, CdDisc } from "./Cd";
+import { Garment, HangTag } from "./Garment";
 import { SectionHeader } from "./ui";
+
+// 「52」「0.48%」のような数値は数え上げる。「4〜8×」などはそのまま表示
+function MetricValue({ value }: { value: string }) {
+  const match = value.match(/^(\d+(?:\.(\d+))?)(%?)$/);
+  if (!match) return <>{value}</>;
+  return (
+    <>
+      <span data-count={match[1]} data-decimals={match[2]?.length ?? 0}>
+        {match[1]}
+      </span>
+      {match[3]}
+    </>
+  );
+}
 
 export default function Research() {
   return (
     <section id="research" className="py-24 md:py-32 px-4 md:px-8">
       <div className="max-w-[1120px] mx-auto">
-        <SectionHeader index="03" label="SPECIAL EDITION" title="研究" lead={research.lab} />
+        <SectionHeader index="03" label="LIMITED EDITION" title="研究" lead={research.lab} />
 
-        {/* 特集盤：黒いパネル */}
-        <div className="rounded-[25px] bg-ink text-white overflow-hidden shadow-[0_20px_60px_rgba(17,17,17,0.25)]">
+        {/* 限定アイテム：黒いパネル */}
+        <div data-reveal className="rounded-[25px] bg-surface text-white overflow-hidden shadow-[0_0_0_1px_var(--stone),0_20px_60px_rgba(0,0,0,0.5)]">
           <div className="p-6 md:p-12 grid lg:grid-cols-[minmax(0,320px)_1fr] gap-10 lg:gap-14">
-            {/* ジャケット + ディスク */}
-            <div className="cd-item">
-              <div className="cd-slot max-w-[420px]">
-                <span className="cd-disc-wrap">
-                  <CdDisc label={research.cover.bg} />
-                </span>
-                <span className="cd-case">
-                  <CdCover cover={research.cover} catalog="KL-SP1" year="2025—" />
+            {/* ハンガーに掛かった限定の一着 */}
+            <div>
+              <div className="max-w-[300px] mx-auto lg:mx-0">
+                <span className="rack-bar block" aria-hidden />
+                <span className="hanger-item group">
+                  <Garment cover={research.cover} className="research-garment" />
+                  <span className="absolute right-0 top-[20%]">
+                    <HangTag no="LIMITED" sub="2025—" />
+                  </span>
                 </span>
               </div>
               <p className="mono text-white/60 mt-5 flex items-center gap-2">
@@ -36,9 +51,9 @@ export default function Research() {
               {/* 数値 */}
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/15 rounded-[13px] overflow-hidden">
                 {research.metrics.map((metric) => (
-                  <div key={metric.label} className="bg-ink p-5">
+                  <div key={metric.label} className="bg-surface p-5">
                     <p className="text-[40px] md:text-[48px] font-extrabold tracking-[-0.045em] leading-none text-laser">
-                      {metric.value}
+                      <MetricValue value={metric.value} />
                     </p>
                     <p className="mt-3 text-[14px] font-extrabold">{metric.label}</p>
                     <p className="mono text-white/50 mt-1">{metric.note}</p>
@@ -57,7 +72,7 @@ export default function Research() {
                   <span className="mono text-white/50">{step.label}</span>
                   <span
                     className={`ml-auto mono px-2 py-1 rounded-[1.5px] ${
-                      step.status === "完了" ? "bg-white text-ink" : "bg-laser text-ink"
+                      step.status === "完了" ? "bg-white text-[#111]" : "bg-laser text-[#111]"
                     }`}
                   >
                     {step.status}

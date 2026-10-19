@@ -1,6 +1,5 @@
 import { achievements, careers, personalInfo, works } from "@/data/portfolio";
 import Image from "next/image";
-import { PlayingBars } from "./Cd";
 import { SectionHeader } from "./ui";
 
 export default function About() {
@@ -13,38 +12,37 @@ export default function About() {
   return (
     <section id="about" className="py-24 md:py-32 px-4 md:px-8">
       <div className="max-w-[1120px] mx-auto">
-        <SectionHeader index="01" label="ARTIST PROFILE" title="自己紹介" />
+        <SectionHeader index="01" label="DESIGNER PROFILE" title="自己紹介" />
 
         <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 md:gap-12 items-start">
           {/* アーティスト写真 + ステッカー */}
-          <div className="relative max-w-[440px] w-full mx-auto md:mx-0">
-            {/* ピクチャーディスク */}
-            <div className="picture-disc relative aspect-square rounded-full">
+          <div className="relative max-w-[440px] w-full mx-auto md:mx-0" data-reveal="pop">
+            {/* プロフィール写真（ステッチ付きの丸い布） */}
+            <div className="photo-frame stitch relative aspect-square rounded-full">
               <div className="absolute inset-[3.5%] rounded-full overflow-hidden bg-canvas">
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/profile.jpeg`}
+                  src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/avatar.jpg`}
                   alt={personalInfo.name}
                   fill
-                  className="object-cover scale-[1.3]"
-                  style={{ objectPosition: "center 52%" }}
+                  className="object-cover"
                 />
               </div>
             </div>
             <div className="mt-6 text-center md:text-left">
-              <p className="mono text-muted">ARTIST</p>
+              <p className="mono text-muted">DESIGNER</p>
               <p className="text-[24px] font-extrabold tracking-[-0.036em]">{personalInfo.nameEn}</p>
             </div>
             <span className="sticker absolute -top-4 -right-3 rotate-[8deg] bg-laser">{personalInfo.age} 歳</span>
             <span className="sticker absolute top-[38%] -left-4 rotate-[-7deg] bg-[#ffd400]">
               {personalInfo.location}出身
             </span>
-            <span className="sticker absolute top-[72%] -right-2 rotate-[-4deg] bg-ink !text-white flex items-center gap-2">
-              <PlayingBars /> NOW @ ZOZO SRE
+            <span className="sticker absolute top-[72%] -right-2 rotate-[-4deg] bg-ink !text-on-ink flex items-center gap-2">
+              <span className="laser-dot" /> NOW @ ZOZO SRE
             </span>
           </div>
 
           {/* プロフィール本文 */}
-          <div className="min-w-0 pt-4 md:pt-0">
+          <div className="min-w-0 pt-4 md:pt-0" data-reveal style={{ "--d": "150ms" } as React.CSSProperties}>
             <h3 className="text-[44px] md:text-[64px] font-extrabold tracking-[-0.045em] leading-[1]">
               {personalInfo.name}
             </h3>
@@ -69,7 +67,7 @@ export default function About() {
               {stats.map((stat, i) => (
                 <div key={stat.label} className={`py-4 ${i > 0 ? "pl-4 border-l-2 border-stone" : ""}`}>
                   <p className="text-[36px] md:text-[48px] font-extrabold tracking-[-0.045em] leading-none">
-                    {stat.value}
+                    <span data-count={stat.value}>{stat.value}</span>
                     <span className="text-[16px] md:text-[18px] ml-1">{stat.unit}</span>
                   </p>
                   <p className="mono text-muted mt-2">{stat.label}</p>

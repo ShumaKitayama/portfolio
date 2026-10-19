@@ -1,10 +1,11 @@
 "use client";
 
-import { achievements, certifications, skillGroups } from "@/data/portfolio";
+import { achievements, certifications, skillGroups, skillLevels } from "@/data/portfolio";
 import { useEffect, useRef, useState } from "react";
 import { SectionHeader, Window } from "./ui";
 
-const SEGMENTS = 10;
+const SEGMENTS = 5;
+const levelLabel = (level: number) => skillLevels.find((l) => l.level === level)?.label ?? "";
 
 // 画面に入ったらメーターを点灯させる
 function useInView<T extends Element>() {
@@ -33,11 +34,11 @@ function useInView<T extends Element>() {
 
 function Meter({ level }: { level: number }) {
   return (
-    <span className="meter" role="img" aria-label={`レベル ${level} / ${SEGMENTS}`}>
+    <span className="meter" role="img" aria-label={`レベル ${level} / ${SEGMENTS}：${levelLabel(level)}`}>
       {Array.from({ length: SEGMENTS }, (_, i) => (
         <span
           key={i}
-          className={i < level ? `seg on ${i >= 8 ? "peak" : i >= 6 ? "hot" : ""}` : "seg"}
+          className={i < level ? `seg on ${i >= 4 ? "peak" : i >= 3 ? "hot" : ""}` : "seg"}
           style={{ transitionDelay: `${i * 35}ms` }}
         />
       ))}
@@ -53,14 +54,26 @@ export default function Skills() {
       <div className="max-w-[1120px] mx-auto">
         <SectionHeader
           index="05"
-          label="MIXER"
+          label="MATERIAL"
           title="スキル・実績"
-          lead="職歴と制作物での使用実績をもとに、レベルをメーターで表しています。"
+          lead="使った経験と、今どのくらい扱えるかを 5 段階のメーターで表しています。"
         />
 
+        {/* レベルの凡例 */}
+        <ol className="mb-8 flex flex-wrap gap-2" data-reveal>
+          {skillLevels.map(({ level, label }) => (
+            <li key={level} className="tag !text-[12px] !py-[6px] gap-2">
+              <span className="mono">LV.{level}</span>
+              {label}
+            </li>
+          ))}
+        </ol>
+
         <div ref={ref} className={`mixer ${inView ? "is-live" : ""} grid md:grid-cols-2 gap-5`}>
-          {skillGroups.map((group) => (
+          {skillGroups.map((group, i) => (
             <Window
+              revealDelay={(i % 2) * 120}
+              className="min-w-0"
               key={group.channel}
               title={group.channel}
               right={<span className="text-[13px] font-extrabold">{group.label}</span>}
@@ -70,7 +83,9 @@ export default function Skills() {
                   <li key={skill.name}>
                     <div className="flex items-baseline justify-between gap-3 mb-[6px]">
                       <span className="text-[15px] font-extrabold tracking-[-0.02em]">{skill.name}</span>
-                      <span className="mono text-muted">{String(skill.level).padStart(2, "0")}</span>
+                      <span className="mono text-muted text-right">
+                        LV.{skill.level}
+                      </span>
                     </div>
                     <Meter level={skill.level} />
                     {skill.used && <p className="mono !font-bold text-muted mt-[6px] truncate">{skill.used}</p>}
@@ -82,12 +97,12 @@ export default function Skills() {
         </div>
 
         <div className="mt-5 grid md:grid-cols-2 gap-5">
-          {/* 受賞：ゴールドディスク */}
-          <Window title="awards / gold-disc">
+          {/* 受賞：金のボタン */}
+          <Window title="awards / gold-button" revealDelay={0}>
             <ul className="p-6 md:p-8 space-y-6">
               {achievements.map((achievement) => (
                 <li key={achievement.year + achievement.project} className="flex gap-4 items-start">
-                  <span className="gold-disc flex-shrink-0" aria-hidden />
+                  <span className="gold-button flex-shrink-0" aria-hidden />
                   <div className="min-w-0">
                     <p className="mono text-muted mb-1">{achievement.year}</p>
                     <p className="text-[16px] md:text-[17px] font-extrabold leading-[1.45] tracking-[-0.02em]">
@@ -102,7 +117,7 @@ export default function Skills() {
             </ul>
           </Window>
 
-          <Window title="certifications.txt">
+          <Window title="certifications.txt" revealDelay={120}>
             <ul className="p-6 md:p-8 space-y-4">
               {certifications.map((cert) => (
                 <li key={cert} className="flex gap-3 text-[15px] font-bold prose-ja">

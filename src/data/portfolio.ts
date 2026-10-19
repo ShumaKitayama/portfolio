@@ -304,7 +304,7 @@ export const education = [
 ];
 
 export const research = {
-  cover: { title: "MADQN", bg: "#111111", fg: "#3dff7a", pattern: "rings" } as Cover,
+  cover: { title: "MADQN", bg: "#f1f1ee", fg: "#111111", pattern: "rings", garment: "tee" } as Cover,
   title: "マルチエージェント深層 Q 学習による原子配置の自律的な安定構造の探索",
   lab: "阿南高専 平山研究室・卒業研究",
   status: "研究中",
@@ -343,7 +343,7 @@ export const research = {
 
 export type Skill = {
   name: string;
-  // 1〜10 のメーター表示（10 が最大）
+  // 1〜5（skillLevels の段階）
   level: number;
   // どこで使ったか
   used?: string;
@@ -351,88 +351,98 @@ export type Skill = {
 
 export type SkillGroup = { channel: string; label: string; items: Skill[] };
 
-// 職歴・制作物での使用実績をもとにしたスキル
+export const skillLevels = [
+  { level: 1, label: "触ったことがある" },
+  { level: 2, label: "勉強中" },
+  { level: 3, label: "AI を使って何とかわかる" },
+  { level: 4, label: "AI があれば活用できる" },
+  { level: 5, label: "AI がなくともある程度わかる" },
+];
+
 export const skillGroups: SkillGroup[] = [
   {
-    channel: "CH.1",
+    channel: "TAG.01",
     label: "言語",
     items: [
-      { name: "Go", level: 9, used: "ドワンゴ・ZOZO・Juice 学園・InterviewHack" },
-      { name: "TypeScript", level: 9, used: "サイファー・テック・Towhy・HADAL ほか多数" },
-      { name: "Python", level: 7, used: "サイファー・テック・研究・BuildUp" },
-      { name: "SQL", level: 7, used: "ZOZO（性能改善）・ドワンゴ" },
-      { name: "Java", level: 5, used: "資格・Spring Boot" },
-      { name: "Shell", level: 4, used: "ZOZO" },
+      { name: "Go", level: 5, used: "ドワンゴ・ZOZO・Juice 学園・InterviewHack" },
+      { name: "TypeScript", level: 4, used: "サイファー・テック・Towhy・HADAL ほか多数" },
+      { name: "Java", level: 4, used: "資格・Spring Boot" },
+      { name: "Python", level: 3, used: "サイファー・テック・研究・BuildUp" },
+      { name: "SQL", level: 3, used: "ZOZO（性能改善）・ドワンゴ" },
+      { name: "Shell", level: 3, used: "ZOZO" },
       { name: "C", level: 3, used: "資格" },
     ],
   },
   {
-    channel: "CH.2",
+    channel: "TAG.02",
     label: "フロントエンド",
     items: [
-      { name: "React", level: 9, used: "サイファー・テック・Towhy・制作物多数" },
-      { name: "Tailwind CSS", level: 6, used: "Juice 学園・InterviewHack・このサイト" },
-      { name: "Next.js", level: 5, used: "このサイト" },
-      { name: "Three.js", level: 5, used: "Project HADAL" },
-      { name: "React Native / Expo", level: 3, used: "Ren-Kei" },
+      { name: "React", level: 3, used: "サイファー・テック・Towhy・制作物多数" },
+      { name: "Tailwind CSS", level: 3, used: "Juice 学園・InterviewHack・このサイト" },
+      { name: "Next.js", level: 3, used: "このサイト" },
+      { name: "Three.js", level: 3, used: "Project HADAL" },
+      { name: "React Native / Expo", level: 2, used: "Ren-Kei" },
     ],
   },
   {
-    channel: "CH.3",
+    channel: "TAG.03",
     label: "バックエンド",
     items: [
-      { name: "Gin", level: 9, used: "ドワンゴ・Juice 学園・動画共有システム" },
-      { name: "クリーンアーキテクチャ / DDD", level: 7, used: "ドワンゴ・InterviewHack" },
-      { name: "FastAPI", level: 5, used: "BuildUp" },
-      { name: "Flask", level: 4, used: "サイファー・テック" },
-      { name: "Express", level: 4, used: "Kikasete" },
-      { name: "Spring Boot", level: 4, used: "個人学習" },
+      { name: "Gin", level: 5, used: "ドワンゴ・Juice 学園・VideoShare Lab" },
+      { name: "Express", level: 3, used: "Kikasete" },
+      { name: "Spring Boot", level: 3, used: "個人学習" },
+      { name: "クリーンアーキテクチャ / DDD", level: 2, used: "ドワンゴ・InterviewHack" },
+      { name: "FastAPI", level: 2, used: "BuildUp" },
+      { name: "Flask", level: 2, used: "サイファー・テック" },
     ],
   },
   {
-    channel: "CH.4",
+    channel: "TAG.04",
     label: "インフラ・SRE",
     items: [
-      { name: "AWS", level: 8, used: "ZOZO・サイファー・テック" },
-      { name: "GitHub Actions", level: 8, used: "ZOZO・HADAL・動画共有システム" },
-      { name: "Docker", level: 8, used: "Juice 学園・BuildUp ほか" },
-      { name: "CloudFormation", level: 7, used: "ZOZO" },
-      { name: "Cloudflare", level: 6, used: "HADAL（Workers）・Juice 学園" },
-      { name: "Datadog", level: 5, used: "ZOZO（DBM）" },
-      { name: "Vercel", level: 5, used: "動画共有システム・ぼきゃぶらりんぐ" },
-      { name: "nginx", level: 4, used: "BuildUp" },
+      { name: "Docker", level: 4, used: "Juice 学園・BuildUp ほか" },
+      { name: "Cloudflare", level: 4, used: "HADAL（Workers）・Juice 学園" },
+      { name: "Vercel", level: 4, used: "VideoShare Lab・ぼきゃぶらりんぐ" },
+      {
+        name: "AWS",
+        level: 3,
+        used: "ZOZO（CloudFormation・Lambda・CodeDeploy・IAM・ALB・Athena など）・サイファー・テック",
+      },
+      { name: "GitHub Actions", level: 3, used: "ZOZO・HADAL・VideoShare Lab" },
+      { name: "Datadog", level: 2, used: "ZOZO（DBM）" },
+      { name: "nginx", level: 2, used: "BuildUp" },
     ],
   },
   {
-    channel: "CH.5",
+    channel: "TAG.05",
     label: "データベース",
     items: [
-      { name: "MySQL", level: 7, used: "ZOZO（インデックス設計）" },
-      { name: "PostgreSQL", level: 7, used: "動画共有システム・BuildUp" },
-      { name: "MongoDB", level: 7, used: "Juice 学園" },
-      { name: "Redis", level: 6, used: "Juice 学園" },
-      { name: "Supabase", level: 6, used: "InterviewHack・ぼきゃぶらりんぐ" },
-      { name: "Firebase", level: 3, used: "Ren-Kei" },
+      { name: "PostgreSQL", level: 4, used: "VideoShare Lab・BuildUp" },
+      { name: "MongoDB", level: 4, used: "Juice 学園" },
+      { name: "MySQL", level: 3, used: "ZOZO（インデックス設計）" },
+      { name: "Redis", level: 3, used: "Juice 学園" },
+      { name: "Supabase", level: 3, used: "InterviewHack・ぼきゃぶらりんぐ" },
+      { name: "Firebase", level: 1, used: "Ren-Kei" },
     ],
   },
   {
-    channel: "CH.6",
+    channel: "TAG.06",
     label: "テスト・セキュリティ",
     items: [
-      { name: "Playwright", level: 7, used: "Towhy（E2E 約 20 件）・HADAL" },
-      { name: "k6", level: 5, used: "ZOZO（負荷試験）" },
-      { name: "Vitest", level: 5, used: "Project HADAL" },
-      { name: "Burp Suite", level: 4, used: "サイファー・テック（脆弱性診断）" },
+      { name: "Playwright", level: 4, used: "Towhy（E2E 約 20 件）・HADAL" },
+      { name: "Burp Suite", level: 2, used: "サイファー・テック（脆弱性診断）" },
+      { name: "k6", level: 1, used: "ZOZO（負荷試験）" },
+      { name: "Vitest", level: 1, used: "Project HADAL" },
     ],
   },
   {
-    channel: "CH.7",
+    channel: "TAG.07",
     label: "AI・機械学習",
     items: [
-      { name: "強化学習（DQN）", level: 7, used: "卒業研究" },
-      { name: "PyTorch", level: 6, used: "卒業研究" },
-      { name: "LLM API（Gemini / OpenAI）", level: 6, used: "ぼきゃぶらりんぐ・Kikasete・InterviewHack" },
-      { name: "Claude Code", level: 8, used: "Towhy・制作物" },
+      { name: "AI コーディング（Claude Code / Codex / Cursor）", level: 5, used: "Towhy・制作物全般" },
+      { name: "LLM API（Gemini / OpenAI）", level: 5, used: "ぼきゃぶらりんぐ・Kikasete・InterviewHack" },
+      { name: "強化学習（DQN）", level: 3, used: "卒業研究" },
+      { name: "PyTorch", level: 2, used: "卒業研究" },
     ],
   },
 ];
@@ -455,14 +465,29 @@ export const achievements = [
   },
 ];
 
-export type CoverPattern = "sonar" | "stripes" | "dots" | "grid" | "rings" | "wave";
+export type CoverPattern =
+  | "sonar"
+  | "stripes"
+  | "pinstripe"
+  | "rib"
+  | "dots"
+  | "grid"
+  | "rings"
+  | "wave"
+  | "twill"
+  | "none";
 
-// CD ジャケットのデザイン
+export type GarmentType = "tee" | "hoodie" | "shirt" | "jacket" | "coat" | "noragi" | "knit";
+
+// ハンガーに掛ける服のデザイン（色・柄・胸のプリント）
 export type Cover = {
   title: string;
   bg: string;
   fg: string;
   pattern: CoverPattern;
+  garment: GarmentType;
+  // 胸のプリントの大きさ（既定は large）
+  print?: "large" | "small" | "none";
 };
 
 export type Work = {
@@ -476,12 +501,14 @@ export type Work = {
   status: string;
   url?: string;
   repo?: string;
+  // 詳細ポップアップに出すスクリーンショット（public/images/works/ 以下）
+  shots?: { src: string; alt: string; width: number; height: number }[];
 };
 
 export const works: Work[] = [
   {
     title: "Project HADAL",
-    cover: { title: "HADAL", bg: "#0b1d3a", fg: "#3dff7a", pattern: "sonar" },
+    cover: { title: "HADAL", bg: "#10141d", fg: "#56627a", pattern: "sonar", garment: "hoodie" },
     period: "2026 年 9 月〜10 月",
     team: "個人開発",
     tech: ["TypeScript", "React", "Three.js", "Zustand", "Zod", "Vitest", "Playwright", "Cloudflare Workers"],
@@ -494,10 +521,13 @@ export const works: Work[] = [
     ],
     status: "公開中",
     url: "https://project-hadal.shin-deployment.workers.dev",
+    shots: [
+      { src: "/images/works/hadal.webp", alt: "ハンガー画面：潜水艦と乗員を選んでビルドを組む", width: 1600, height: 805 },
+    ],
   },
   {
-    title: "動画共有システム（中学生向け教材）",
-    cover: { title: "VIDEO LAB", bg: "#ff4f9a", fg: "#111111", pattern: "grid" },
+    title: "VideoShare Lab（中学生向け教材）",
+    cover: { title: "VIDEOSHARE LAB", bg: "#141416", fg: "#8e8e95", pattern: "twill", garment: "jacket" },
     period: "2026 年 5 月〜10 月",
     team: "チーム開発（2 名）・バックエンド担当",
     tech: ["TypeScript", "React", "Go", "Gin", "PostgreSQL", "Vercel", "GitHub Actions"],
@@ -510,10 +540,13 @@ export const works: Work[] = [
     ],
     status: "体験会で運用中",
     repo: "https://github.com/ShumaKitayama/video-sharing-system",
+    shots: [
+      { src: "/images/works/videoshare.webp", alt: "Lab モード：左のステップでコードを書き換えると、右のプレビューに反映される", width: 1600, height: 803 },
+    ],
   },
   {
     title: "Ren-Kei（連契）",
-    cover: { title: "連契", bg: "#ff7a1a", fg: "#111111", pattern: "wave" },
+    cover: { title: "連契", bg: "#1d2541", fg: "#7d8cbf", pattern: "wave", garment: "noragi" },
     period: "2026 年 7 月〜9 月",
     team: "チーム開発（5〜6 名）・開発メンバー",
     tech: ["TypeScript", "React Native", "Expo", "Firebase", "MediaPipe", "Python"],
@@ -524,10 +557,13 @@ export const works: Work[] = [
     ],
     status: "敢闘賞",
     repo: "https://github.com/rn40Rext/Ren-kei_procon",
+    shots: [
+      { src: "/images/works/renkei.webp", alt: "リアルタイム判定画面：姿勢推定で踊りを採点し、GREAT / GOOD / MISS を表示", width: 892, height: 1910 },
+    ],
   },
   {
     title: "Juice 学園 ポータルサイト",
-    cover: { title: "JUICE", bg: "#ffd400", fg: "#111111", pattern: "dots" },
+    cover: { title: "JUICE", bg: "#e7e1d3", fg: "#1a1a1a", pattern: "none", garment: "tee", print: "small" },
     period: "2025 年 2 月〜2026 年 1 月",
     team: "個人開発",
     tech: ["TypeScript", "React", "Go", "Gin", "MongoDB", "Redis", "Docker", "Cloudflare", "Stripe"],
@@ -541,10 +577,14 @@ export const works: Work[] = [
     ],
     status: "運用中 (Demo)",
     url: "https://juiceacademydemo.win",
+    shots: [
+      { src: "/images/works/juice.webp", alt: "マイページの支払い方法：カード情報は Stripe で管理し、サーバーには保存しない", width: 1020, height: 601 },
+      { src: "/images/works/juice-otp.webp", alt: "2 要素認証のメール：Gmail API でワンタイムの認証コードを送る", width: 900, height: 1155 },
+    ],
   },
   {
     title: "InterviewHack",
-    cover: { title: "INTERVIEW HACK", bg: "#2f6bff", fg: "#ffffff", pattern: "stripes" },
+    cover: { title: "INTERVIEW HACK", bg: "#f1f1ee", fg: "#111111", pattern: "pinstripe", garment: "shirt" },
     period: "2026 年 2 月〜",
     team: "個人開発",
     tech: ["TypeScript", "React", "Go", "Gin", "Supabase", "Stripe", "OpenAI", "Gemini"],
@@ -556,10 +596,13 @@ export const works: Work[] = [
       "Supabase の RLS と、クレジット制による AI 利用量の制御",
     ],
     status: "開発中",
+    shots: [
+      { src: "/images/works/interviewhack.webp", alt: "ホーム（就活ダッシュボード）と、自己資産・企業の追加画面", width: 900, height: 1087 },
+    ],
   },
   {
     title: "BuildUp",
-    cover: { title: "BUILD UP", bg: "#3dff7a", fg: "#111111", pattern: "grid" },
+    cover: { title: "BUILD UP", bg: "#36363b", fg: "#8a8a92", pattern: "none", garment: "hoodie" },
     period: "2025 年 11 月〜12 月",
     team: "チーム開発・バックエンド／インフラ担当",
     tech: ["Python", "FastAPI", "PostgreSQL", "WebSocket", "WebRTC", "Docker", "nginx"],
@@ -571,10 +614,14 @@ export const works: Work[] = [
     ],
     status: "開発完了",
     repo: "https://github.com/tamago4976/BuildUp",
+    shots: [
+      { src: "/images/works/buildup-projects.webp", alt: "プロジェクト一覧：スキルで絞り込んで、参加したいプロジェクトを探す", width: 797, height: 622 },
+      { src: "/images/works/buildup-profile.webp", alt: "プロフィール：自己紹介・連絡先・スキルをまとめて公開する", width: 797, height: 622 },
+    ],
   },
   {
     title: "ぼきゃぶらりんぐ",
-    cover: { title: "ぼきゃぶらりんぐ", bg: "#8b5cf6", fg: "#ffffff", pattern: "rings" },
+    cover: { title: "ぼきゃぶらりんぐ", bg: "#b4ac9e", fg: "#5f584d", pattern: "rib", garment: "knit", print: "small" },
     period: "2025 年 5 月〜7 月",
     team: "チーム開発",
     tech: ["TypeScript", "React", "Supabase", "Gemini", "Vercel"],
@@ -587,15 +634,21 @@ export const works: Work[] = [
     ],
     status: "公開中",
     url: "https://ring-vocabulary.vercel.app",
+    shots: [
+      { src: "/images/works/vocabularing.webp", alt: "フラッシュカード学習：音声読み上げ付きで、覚えた単語は隠して復習できる", width: 1600, height: 799 },
+    ],
   },
   {
     title: "音声アシスタント Kikasete",
-    cover: { title: "KIKASETE", bg: "#ff3b30", fg: "#ffffff", pattern: "sonar" },
+    cover: { title: "KIKASETE", bg: "#2a2a2f", fg: "#8e8e95", pattern: "none", garment: "coat" },
     tech: ["TypeScript", "React", "Express", "Vercel"],
     description:
       "地元飲食店向けに開発した多言語対応の対話型 AI アシスタント。Gemini 2.0 Flash を使用し、メニュー認識・リアルタイム音声再生・字幕表示に対応。実店舗導入済み。",
     url: "https://kikasete-public.vercel.app",
     status: "実店舗導入済み",
+    shots: [
+      { src: "/images/works/kikasete.webp", alt: "会話画面：言語を選び、「話す」ボタンで音声入力する", width: 1600, height: 802 },
+    ],
   },
 ];
 

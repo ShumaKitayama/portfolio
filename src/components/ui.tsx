@@ -5,13 +5,19 @@ type WindowProps = {
   right?: ReactNode;
   hover?: boolean;
   className?: string;
+  // スクロールで出現させる（遅延 ms）
+  revealDelay?: number;
   children: ReactNode;
 };
 
 // macOS 風のウィンドウカード
-export function Window({ title, right, hover = false, className = "", children }: WindowProps) {
+export function Window({ title, right, hover = false, className = "", revealDelay, children }: WindowProps) {
   return (
-    <div className={`window ${hover ? "window-hover" : ""} ${className}`}>
+    <div
+      className={`window ${hover ? "window-hover" : ""} ${className}`}
+      data-reveal={revealDelay !== undefined ? "" : undefined}
+      style={revealDelay !== undefined ? ({ "--d": `${revealDelay}ms` } as React.CSSProperties) : undefined}
+    >
       <div className="window-bar">
         <div className="traffic" aria-hidden>
           <span />
@@ -35,7 +41,7 @@ type SectionHeaderProps = {
 
 export function SectionHeader({ index, label, title, lead }: SectionHeaderProps) {
   return (
-    <div className="mb-12 md:mb-16">
+    <div className="mb-12 md:mb-16" data-reveal="left">
       <p className="mono text-muted mb-4 flex items-center gap-2">
         <span className="laser-dot" />
         {index} / {label}

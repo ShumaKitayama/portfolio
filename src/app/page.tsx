@@ -4,12 +4,14 @@ import Contact from "@/components/Contact";
 import Hero from "@/components/Hero";
 import Navigation from "@/components/Navigation";
 import Research from "@/components/Research";
+import ScrollEffects from "@/components/ScrollEffects";
 import Skills from "@/components/Skills";
 import Works from "@/components/Works";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
+      <ScrollEffects />
       <Navigation />
       <Hero />
       <About />

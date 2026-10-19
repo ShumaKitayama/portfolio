@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         canvas: "var(--canvas)",
         ink: "var(--ink)",
+        "on-ink": "var(--on-ink)",
         surface: "var(--surface)",
         graphite: "var(--graphite)",
         stone: "var(--stone)",
