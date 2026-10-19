@@ -5,8 +5,9 @@ import Image from "next/image";
 import AccentMixer from "./AccentMixer";
 import { Garment } from "./Garment";
 
-// ラックに掛ける 3 着（中央が最新作）
-const featured = [works[1], works[0], works[3]].map((work) => ({ work }));
+// ラックに掛ける 3 着
+const byTitle = (prefix: string) => works.find((w) => w.title.startsWith(prefix)) ?? works[0];
+const featured = [byTitle("VideoShare"), byTitle("Project HADAL"), byTitle("Juice")].map((work) => ({ work }));
 
 export default function Hero() {
   const scrollToWorks = () => {

@@ -619,6 +619,26 @@ export type Work = {
 
 export const works: Work[] = [
   {
+    title: "ResolveBridge",
+    cover: { title: "RESOLVE BRIDGE", bg: "#18181b", fg: "#9a9aa1", pattern: "pinstripe", garment: "shirt" },
+    period: "2026 年 10 月",
+    team: "個人開発",
+    tech: ["Python", "Lua", "Swift", "MCP", "DaVinci Resolve", "Fusion", "Claude Code"],
+    description:
+      "Claude Code から DaVinci Resolve（無料版 21.1）を操作するための、Fusion の Lua ブリッジと MCP サーバー。外部スクリプトを受け付けない無料版でも、Resolve 内に常駐する Lua を中継役にして、ノードの追加・パラメーターの設定・フレームの書き出しまでを AI に任せられる。",
+    highlights: [
+      "Resolve 内に常駐する Lua とファイルで命令・結果をやり取りし、MCP サーバー（fusion-bridge）として Claude Code に登録",
+      "ノード操作・値の設定・アニメーション・1 フレームの書き出しなど 17 個のツール。書き換えは取り消し 1 回分にまとめ、引数は Lua の値としてエスケープ",
+      "ファイル名に共有トークンを含む命令だけを実行する認証。結果やエラーに含まれるトークンは伏せ字にする",
+      "無料版 21.1 で使える API や、Resolve が落ちる操作などの制約を実測して README にまとめた",
+    ],
+    status: "動作確認済み",
+    repo: "https://github.com/ShumaKitayama/ResolveBridge",
+    shots: [
+      { src: "/images/works/resolvebridge.webp", alt: "Fusion ページでブリッジを起動したところ：コンソールに起動ログと命令の結果が流れる", width: 1600, height: 877 },
+    ],
+  },
+  {
     title: "Project HADAL",
     cover: { title: "HADAL", bg: "#10141d", fg: "#56627a", pattern: "sonar", garment: "hoodie" },
     period: "2026 年 9 月〜10 月",

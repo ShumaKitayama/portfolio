@@ -9,7 +9,7 @@ import { SectionHeader, Tags } from "./ui";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
-const liveStatuses = ["公開中", "運用中 (Demo)", "実店舗導入済み", "体験会で運用中", "敢闘賞"];
+const liveStatuses = ["公開中", "運用中 (Demo)", "実店舗導入済み", "体験会で運用中", "敢闘賞", "動作確認済み"];
 
 function StatusLabel({ status }: { status: string }) {
   return (
