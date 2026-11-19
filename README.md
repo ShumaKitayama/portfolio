@@ -140,5 +140,5 @@ portfolio/
 - **X (Twitter)**: [@2005_helloworld](https://x.com/2005_helloworld)
 - **GitHub**: [@Shumakitayama](https://github.com/Shumakitayama)
 - **Instagram**: [@kittyan_0411](https://www.instagram.com/kittyan_0411)
-- **Qiita**: [@baningugozira](https://qiita.com/baningugozira)
+- **Qiita**: [@Dr_Shinn](https://qiita.com/Dr_Shinn)
 

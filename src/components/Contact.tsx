@@ -8,7 +8,7 @@ export default function Contact() {
   const links = [
     { name: "X", handle: "@2005_helloworld", url: socialLinks.twitter, icon: FaXTwitter },
     { name: "GitHub", handle: "Shumakitayama", url: socialLinks.github, icon: FaGithub },
-    { name: "Qiita", handle: "baningugozira", url: socialLinks.qiita, icon: SiQiita },
+    { name: "Qiita", handle: "Dr_Shinn", url: socialLinks.qiita, icon: SiQiita },
   ];
 
   return (

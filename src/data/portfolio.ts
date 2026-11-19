@@ -787,5 +787,5 @@ export const works: Work[] = [
 export const socialLinks = {
   twitter: "https://x.com/2005_helloworld",
   github: "https://github.com/Shumakitayama",
-  qiita: "https://qiita.com/baningugozira",
+  qiita: "https://qiita.com/Dr_Shinn",
 };
