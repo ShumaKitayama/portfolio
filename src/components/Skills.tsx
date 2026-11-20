@@ -39,7 +39,7 @@ function Meter({ level }: { level: number }) {
         <span
           key={i}
           className={i < level ? `seg on ${i >= 4 ? "peak" : i >= 3 ? "hot" : ""}` : "seg"}
-          style={{ transitionDelay: `${i * 35}ms` }}
+          style={{ transitionDelay: `${i * 35}ms`, "--s": i } as React.CSSProperties}
         />
       ))}
     </span>
@@ -80,7 +80,7 @@ export default function Skills() {
             >
               <ul className="p-5 md:p-6 space-y-4">
                 {group.items.map((skill) => (
-                  <li key={skill.name}>
+                  <li key={skill.name} data-scroll="enter">
                     <div className="flex items-baseline justify-between gap-3 mb-[6px]">
                       <span className="text-[15px] font-extrabold tracking-[-0.02em]">{skill.name}</span>
                       <span className="mono text-muted text-right">

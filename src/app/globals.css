@@ -49,6 +49,21 @@
   --lag-light: 0.2s;
   /* 曲送りでずらす距離 */
   --skip-shift: 24px;
+
+  /* スクロール連動。--p（0〜1）に掛ける量 */
+  --depth-far: 50vh; /* 奥の層（グリッド）：ほぼ止まって見える */
+  --depth-mid: 32vh; /* 主役（ラック）：ゆっくり遅れて残る */
+  --depth-near: -6vh; /* 手前（カード）：速く抜けていく */
+  --depth-layer: 36px; /* ステッカー・本文・カードの重なりのずれ */
+  --zoom-hero: 0.15; /* ラックが寄ってくる量 */
+  --zoom-from: 0.92; /* 研究パネルが寄る前の大きさ */
+  --title-from: 0.82; /* 大見出しが育つ前の大きさ */
+  --spread-rack: 25%; /* ヒーローの服が左右に分かれる量 */
+  --drift-rack: 28px; /* ラックの服が横に滑る量 */
+  --tilt-rack: 4deg; /* 滑るときの服の傾き */
+  --record-turn: 120deg; /* 写真の縁（ステッチ）が回る量 */
+  --fade-near: 1.8; /* 手前の層が消える速さ */
+  --fade-cue: 5; /* スクロール誘導が消える速さ */
 }
 
 html {
@@ -245,9 +260,9 @@ dialog.liner[open] {
   }
 }
 
+/* backwards：出現後は通常のスタイルに戻し、スクロール連動の opacity を効かせる */
 .rise {
-  opacity: 0;
-  animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 
 /* details の開閉マーカーを消す */
@@ -330,20 +345,13 @@ details[open] > .track-row {
 .mixer.is-live .meter .seg.on.peak {
   background: #ff4f9a;
 }
-/* 点灯したセグメントは VU メーターのように下から跳ね上がる */
+/* 点灯したセグメントは下から伸びる（伸び具合はスクロール連動。下の「スクロール連動」を参照） */
 .meter .seg.on {
   transform-origin: 50% 100%;
-  transition:
-    background 0.25s,
-    transform var(--dur-ui) var(--ease-spring);
-}
-html[data-reveal-ready="on"] .mixer:not(.is-live) .meter .seg.on {
-  transform: scaleY(0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .meter .seg,
-  .meter .seg.on {
+  .meter .seg {
     transition: none;
   }
 }
@@ -462,16 +470,6 @@ html[data-reveal-ready="on"] [data-reveal].is-visible .laser-dot {
   transform: none;
 }
 
-/* 学歴の線：再生ヘッドのように上から「今」へ引かれていく */
-html[data-reveal-ready="on"] [data-reveal] .edu-tree::before {
-  transform: scaleY(0);
-  transform-origin: 50% 0;
-  transition: transform var(--dur-swing) var(--ease-swing) var(--lag-light);
-}
-html[data-reveal-ready="on"] [data-reveal].is-visible .edu-tree::before {
-  transform: none;
-}
-
 /* 研究の比較バー：左から伸び、DQN が先に着く */
 html[data-reveal-ready="on"] [data-reveal="stage"] .race-bar {
   transform: scaleX(0);
@@ -519,6 +517,107 @@ html[data-reveal-ready="on"] .laser-sweep.is-visible::after {
     opacity: 0;
     transform: translateX(100%);
   }
+}
+
+/* ===== スクロール連動 =====
+ * ScrollEffects が [data-scroll] の要素に進み具合 --p（0〜1）を書き込み、ここで動きに変える。
+ * transform を使う既存の演出（出現・揺れ・ホバー）と重ならないよう、
+ * translate / scale / rotate の個別プロパティと opacity・clip-path だけを使う。
+ * html[data-scroll-ready="on"] の下にだけ書くので、動きを減らす設定・JS なし・未対応ブラウザでは完成形のまま止まる
+ */
+
+/* ヒーロー（exit：画面から出ていく割合）。奥・主役・手前が別の速さで動き、奥行きが出る */
+html[data-scroll-ready="on"] .hero-scene > .grid-bg {
+  translate: 0 calc(var(--p) * var(--depth-far));
+  opacity: calc(1 - var(--p));
+}
+/* 主役のラックは遅れて残り（ピン留めのように）、こちらへ寄ってくる */
+html[data-scroll-ready="on"] .hero-rack {
+  translate: 0 calc(var(--p) * var(--depth-mid));
+  scale: calc(1 + var(--p) * var(--zoom-hero));
+}
+/* 3 着がバーの上を左右へ滑って分かれる */
+html[data-scroll-ready="on"] .hero-scene .hero-hanger {
+  translate: calc((var(--i) - 1) * var(--p) * var(--spread-rack)) 0;
+}
+/* 手前のカードは速く抜け、小さくなりながら消える */
+html[data-scroll-ready="on"] .hero-card {
+  translate: 0 calc(var(--p) * var(--depth-near));
+  scale: calc(1 - var(--p) * var(--zoom-hero) / 2);
+  opacity: calc(1 - var(--p) * var(--fade-near));
+}
+html[data-scroll-ready="on"] .hero-cue {
+  opacity: calc(1 - var(--p) * var(--fade-cue));
+}
+
+/* 大見出し（enter：下から入って画面の上 4 割に来るまで）。再生ヘッドが走るように左から現れ、育つ */
+html[data-scroll-ready="on"] [data-scroll="enter"] > .section-title {
+  transform-origin: 0 100%;
+  scale: calc(var(--title-from) + (1 - var(--title-from)) * var(--p));
+  clip-path: inset(-0.2em calc((1 - var(--p)) * 100% - 0.2em) -0.2em -0.2em);
+}
+html[data-scroll-ready="on"] [data-scroll="enter"] > .section-title + p {
+  translate: 0 calc((1 - var(--p)) * var(--depth-layer));
+}
+
+/* 自己紹介（through：画面を通り抜ける割合）。写真の縁はレコードのように回り、ステッカーは別々の深さで浮く */
+html[data-scroll-ready="on"] [data-scroll] > .photo-frame {
+  rotate: calc(var(--p) * var(--record-turn));
+}
+/* 中の写真は逆に回して正位置を保つ（回るのはステッチの縁だけ） */
+html[data-scroll-ready="on"] [data-scroll] > .photo-frame > * {
+  rotate: calc(var(--p) * var(--record-turn) * -1);
+}
+html[data-scroll-ready="on"] [data-scroll] > .sticker {
+  translate: 0 calc((0.5 - var(--p)) * (var(--i) + 1) * var(--depth-layer));
+}
+
+/* 学歴（track：画面の 7 割の高さを再生ヘッドとして、どこまで読んだか）。線が「今」まで伸びる */
+html[data-scroll-ready="on"] .edu-tree[data-scroll]::before {
+  transform-origin: 50% 0;
+  transform: scaleY(var(--p));
+}
+
+/* 研究（enter）：パネルが寄ってきて落ち着き、限定の一着はフックから大きくなり、本文は一段遅れて上がる */
+html[data-scroll-ready="on"] .research-panel {
+  scale: calc(var(--zoom-from) + (1 - var(--zoom-from)) * var(--p));
+}
+html[data-scroll-ready="on"] .research-panel .research-garment {
+  transform-origin: 50% 0;
+  scale: calc(var(--title-from) + (1 - var(--title-from)) * var(--p));
+}
+html[data-scroll-ready="on"] .research-panel .research-copy {
+  translate: 0 calc((1 - var(--p)) * var(--depth-layer));
+}
+
+/* 制作物（through）：服がバーの上を滑る。列ごとに速さと向きを変え、ラックをめくっているように見せる */
+.rack-slot {
+  --rate: 1;
+}
+.rack-slot:nth-child(even) {
+  --rate: -0.7;
+}
+.rack-slot:nth-child(3n) {
+  --rate: 0.5;
+}
+html[data-scroll-ready="on"] .rack-slot[data-scroll] .hanger-item {
+  translate: calc((var(--p) - 0.5) * var(--rate) * var(--drift-rack)) 0;
+  /* 滑る向きと逆に少し傾く（フックが先に動き、裾が遅れる） */
+  rotate: calc((var(--p) - 0.5) * var(--rate) * var(--tilt-rack) * -1);
+}
+
+/* スキル（enter）：メーターのセグメントが下から順に押し上がる。--s はセグメントの番号 */
+html[data-scroll-ready="on"] [data-scroll] .meter .seg.on {
+  scale: 1 calc(0.15 + 0.85 * clamp(0, (var(--p) - var(--s) * 0.12) / 0.4, 1));
+}
+
+/* 連絡先（enter）：カードは別々の深さから重なりに戻り、エンディングの見出しは寄ってくる */
+html[data-scroll-ready="on"] a[data-scroll] {
+  translate: 0 calc((1 - var(--p)) * var(--i) * var(--depth-layer));
+}
+html[data-scroll-ready="on"] [data-scroll] .ending-title {
+  transform-origin: 50% 100%;
+  scale: calc(var(--title-from) + (1 - var(--title-from)) * var(--p));
 }
 
 /* トップへ戻るボタン */

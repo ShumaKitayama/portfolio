@@ -125,7 +125,7 @@ export default function Career() {
               </div>
               <div className="mono text-muted">education.log — {education.length} entries</div>
             </div>
-            <ol className="edu-tree px-5 md:px-8 py-8 md:py-10">
+            <ol className="edu-tree px-5 md:px-8 py-8 md:py-10" data-scroll="track">
               {education.map((item, i) => {
                 const isNow = i === education.length - 1;
                 return (

@@ -18,13 +18,16 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-4 pt-28 pb-16">
+    <section
+      className="hero-scene relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-4 pt-28 pb-16"
+      data-scroll="exit"
+    >
       <div className="absolute inset-0 grid-bg" aria-hidden />
 
       {/* 小さなハンガーラック（主役のオブジェクト） */}
       <button
         onClick={scrollToWorks}
-        className="group relative w-[min(88vw,520px)] rise"
+        className="hero-rack group relative w-[min(88vw,520px)] rise"
         style={{ animationDelay: "0.1s" }}
         aria-label="制作物を見る"
       >
@@ -43,7 +46,7 @@ export default function Hero() {
       </button>
 
       {/* ウィンドウカード */}
-      <div className="relative mt-[30px] rise" style={{ animationDelay: "0.35s" }}>
+      <div className="hero-card relative mt-[30px] rise" style={{ animationDelay: "0.35s" }}>
         <div className="window w-[min(92vw,420px)]">
           <div className="window-bar">
             <div className="traffic" aria-hidden>
@@ -94,7 +97,7 @@ export default function Hero() {
       {/* スクロール誘導 */}
       <button
         onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
-        className="scroll-cue mt-10 rise"
+        className="hero-cue scroll-cue mt-10 rise"
         style={{ animationDelay: "0.6s" }}
         aria-label="自己紹介へスクロール"
       >

@@ -16,7 +16,7 @@ export default function About() {
 
         <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 md:gap-12 items-start">
           {/* アーティスト写真 + ステッカー */}
-          <div className="relative max-w-[440px] w-full mx-auto md:mx-0" data-reveal="pop">
+          <div className="relative max-w-[440px] w-full mx-auto md:mx-0" data-reveal="pop" data-scroll="through">
             {/* プロフィール写真（ステッチ付きの丸い布） */}
             <div className="photo-frame stitch relative aspect-square rounded-full">
               <div className="absolute inset-[3.5%] rounded-full overflow-hidden bg-canvas">

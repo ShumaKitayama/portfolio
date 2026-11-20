@@ -198,6 +198,7 @@ export default function Works() {
               key={work.title}
               className="rack-slot"
               data-reveal="hang"
+              data-scroll="through"
               style={{ "--d": `${(index % 4) * 110}ms` } as React.CSSProperties}
             >
               <button

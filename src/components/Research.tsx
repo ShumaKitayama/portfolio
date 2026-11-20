@@ -30,7 +30,7 @@ export default function Research() {
         <SectionHeader index="03" label="LIMITED EDITION" title="研究" lead={research.lab} />
 
         {/* 限定アイテム：黒いパネル */}
-        <div data-reveal className="laser-sweep rounded-[25px] bg-surface text-white overflow-hidden shadow-[0_0_0_1px_var(--stone),0_20px_60px_rgba(0,0,0,0.5)]">
+        <div data-reveal data-scroll="enter" className="research-panel laser-sweep rounded-[25px] bg-surface text-white overflow-hidden shadow-[0_0_0_1px_var(--stone),0_20px_60px_rgba(0,0,0,0.5)]">
           <div className="p-6 md:p-12 grid lg:grid-cols-[minmax(0,320px)_1fr] gap-10 lg:gap-14">
             {/* ハンガーに掛かった限定の一着 */}
             <div>
@@ -53,7 +53,7 @@ export default function Research() {
               </p>
             </div>
 
-            <div className="min-w-0">
+            <div className="research-copy min-w-0">
               <h3 className="text-[26px] md:text-[38px] font-extrabold tracking-[-0.04em] leading-[1.25]">
                 {research.title}
               </h3>
