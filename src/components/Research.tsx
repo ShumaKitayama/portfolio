@@ -30,11 +30,15 @@ export default function Research() {
         <SectionHeader index="03" label="LIMITED EDITION" title="研究" lead={research.lab} />
 
         {/* 限定アイテム：黒いパネル */}
-        <div data-reveal className="rounded-[25px] bg-surface text-white overflow-hidden shadow-[0_0_0_1px_var(--stone),0_20px_60px_rgba(0,0,0,0.5)]">
+        <div data-reveal className="laser-sweep rounded-[25px] bg-surface text-white overflow-hidden shadow-[0_0_0_1px_var(--stone),0_20px_60px_rgba(0,0,0,0.5)]">
           <div className="p-6 md:p-12 grid lg:grid-cols-[minmax(0,320px)_1fr] gap-10 lg:gap-14">
             {/* ハンガーに掛かった限定の一着 */}
             <div>
-              <div className="max-w-[300px] mx-auto lg:mx-0">
+              <div
+                className="max-w-[300px] mx-auto lg:mx-0"
+                data-reveal="hang"
+                style={{ "--d": "150ms" } as React.CSSProperties}
+              >
                 <span className="rack-bar block" aria-hidden />
                 <button onClick={open} className="hanger-item group" aria-label="研究の詳細を開く">
                   <Garment cover={research.cover} className="research-garment" />
@@ -44,7 +48,7 @@ export default function Research() {
                 </button>
               </div>
               <p className="mono text-white/60 mt-5 flex items-center gap-2">
-                <span className="laser-dot" />
+                <span className="laser-dot on-air" />
                 {research.status}
               </p>
             </div>
@@ -264,7 +268,7 @@ function ResearchDetail() {
             {/* ステップ数の比較 */}
             <div>
               <p className="text-[15px] font-extrabold mb-4">安定構造に着くまでのステップ数</p>
-              <div className="space-y-6">
+              <div className="space-y-6" data-reveal="stage">
                 {step1.race.map((r) => (
                   <div key={r.label}>
                     <p className="mono text-muted mb-2">{r.label}</p>
@@ -381,7 +385,7 @@ function ResearchDetail() {
             {roadmap.map((r) => (
               <li key={r.month} className={`roadmap-node ${r.now ? "is-now" : ""} ${r.done ? "is-done" : ""}`}>
                 <p className="mono mb-2 flex items-center gap-2">
-                  {r.now && <span className="laser-dot" />}
+                  {r.now && <span className="laser-dot on-air" />}
                   {r.done && <span className="text-laser">✓</span>}
                   {r.month}
                   {r.now && <span className="ml-auto mono text-laser">NOW</span>}

@@ -31,11 +31,17 @@ type ItemDetailProps = {
   total: number;
   onClose: () => void;
   onSkip: (step: number) => void;
+  // 直前の曲送りの向き（開いた直後は 0）
+  skipDir: number;
 };
 
-function ItemDetail({ work, index, total, onClose, onSkip }: ItemDetailProps) {
+function ItemDetail({ work, index, total, onClose, onSkip, skipDir }: ItemDetailProps) {
   return (
-    <div key={index} className="window max-h-[88vh] overflow-y-auto liner-body">
+    <div
+      key={index}
+      className="window max-h-[88vh] overflow-y-auto liner-body"
+      data-skip={skipDir > 0 ? "next" : skipDir < 0 ? "prev" : undefined}
+    >
       <div className="window-bar sticky top-0 bg-surface z-10 rounded-t-[25px]">
         <button onClick={onClose} className="traffic group" aria-label="閉じる">
           <span className="group-hover:!bg-laser" />
@@ -162,15 +168,19 @@ function ItemDetail({ work, index, total, onClose, onSkip }: ItemDetailProps) {
 export default function Works() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [selected, setSelected] = useState<number | null>(null);
+  const [skipDir, setSkipDir] = useState(0);
 
   const open = (index: number) => {
+    setSkipDir(0);
     setSelected(index);
     dialogRef.current?.showModal();
   };
   const close = () => dialogRef.current?.close();
   // 前後のアイテムへ：端まで行ったら反対側へループ
-  const skip = (step: number) =>
+  const skip = (step: number) => {
+    setSkipDir(step);
     setSelected((current) => (current === null ? current : (current + step + works.length) % works.length));
+  };
 
   return (
     <section id="works" className="py-24 md:py-32 px-4 md:px-8 overflow-x-clip">
@@ -187,7 +197,7 @@ export default function Works() {
             <li
               key={work.title}
               className="rack-slot"
-              data-reveal="pop"
+              data-reveal="hang"
               style={{ "--d": `${(index % 4) * 110}ms` } as React.CSSProperties}
             >
               <button
@@ -231,6 +241,7 @@ export default function Works() {
             total={works.length}
             onClose={close}
             onSkip={skip}
+            skipDir={skipDir}
           />
         )}
       </dialog>

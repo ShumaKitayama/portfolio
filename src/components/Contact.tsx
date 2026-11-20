@@ -41,7 +41,7 @@ export default function Contact() {
         </div>
 
         {/* エンディング */}
-        <div className="mt-28 text-center" data-reveal>
+        <div className="laser-sweep mt-28 text-center" data-reveal>
           <p className="mono text-muted mb-4 flex items-center justify-center gap-2">
             <span className="laser-dot" />
             END OF COLLECTION

@@ -21,6 +21,9 @@ function countUp(el: HTMLElement) {
 /**
  * ページ全体のスクロール演出をまとめて受け持つ。
  * - [data-reveal]：画面に入ったらフェードイン（--d で遅延）
+ *   - "left" / "pop"：横から・ポンと出る
+ *   - "hang"：枠はフェードだけ、中の服がラックに掛かって揺れる
+ *   - "stage"：枠は動かさず、中の演出（比較バーなど）のきっかけにする
  * - [data-count]：画面に入ったら数え上げ
  * - 上部の再生バー（スクロール進捗）と、トップへ戻るボタン
  */
@@ -84,7 +87,7 @@ export default function ScrollEffects() {
         aria-label="ページの先頭へ戻る"
         tabIndex={showTop ? 0 : -1}
       >
-        <svg viewBox="0 0 40 28" className="w-8 relative -mt-1" aria-hidden>
+        <svg viewBox="0 0 40 28" className="back-to-top-hanger w-8 relative -mt-1" aria-hidden>
           <path
             d="M20 9 L20 6 Q20 3 23 2.5 Q26 2 25.5 0"
             fill="none"

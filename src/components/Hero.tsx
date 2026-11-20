@@ -79,7 +79,7 @@ export default function Hero() {
               制作物を見る <span aria-hidden>›</span>
             </button>
             <span className="mono text-muted flex items-center gap-2 ml-auto">
-              <span className="laser-dot" />
+              <span className="laser-dot on-air" />
               NOW @ ZOZO SRE
             </span>
           </div>

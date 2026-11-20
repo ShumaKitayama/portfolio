@@ -35,6 +35,20 @@
 
   --shadow-card: 0 0 0 1px var(--stone), 0 8px 24px rgba(0, 0, 0, 0.5);
   --shadow-card-hover: 0 0 0 1px #3a3a40, 0 20px 50px rgba(0, 0, 0, 0.6);
+
+  /* モーション。カーブと長さは既存の演出（ウィンドウ・揺れ・下げ札・now-pulse）から抜き出したもの */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1); /* 出現・ウィンドウの動き */
+  --ease-swing: cubic-bezier(0.3, 0, 0.4, 1); /* 吊られた物の揺れ */
+  --ease-spring: cubic-bezier(0.3, 1.6, 0.5, 1); /* 下げ札の跳ね返り */
+  --dur-ui: 0.35s; /* ポップアップ・小さな出現 */
+  --dur-swing: 1.2s; /* ハンガーの揺れ・線を引く長さ */
+  --dur-sweep: 1.6s; /* 光が横切る長さ */
+  --dur-pulse: 2s; /* 再生中の点滅 */
+  /* 親の出現から少し遅れて動かす分 */
+  --lag-hang: 0.12s;
+  --lag-light: 0.2s;
+  /* 曲送りでずらす距離 */
+  --skip-shift: 24px;
 }
 
 html {
@@ -316,9 +330,20 @@ details[open] > .track-row {
 .mixer.is-live .meter .seg.on.peak {
   background: #ff4f9a;
 }
+/* 点灯したセグメントは VU メーターのように下から跳ね上がる */
+.meter .seg.on {
+  transform-origin: 50% 100%;
+  transition:
+    background 0.25s,
+    transform var(--dur-ui) var(--ease-spring);
+}
+html[data-reveal-ready="on"] .mixer:not(.is-live) .meter .seg.on {
+  transform: scaleY(0.2);
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .meter .seg {
+  .meter .seg,
+  .meter .seg.on {
     transition: none;
   }
 }
@@ -339,9 +364,161 @@ html[data-reveal-ready="on"] [data-reveal="left"] {
 html[data-reveal-ready="on"] [data-reveal="pop"] {
   transform: translateY(16px) scale(0.94) rotate(-1.5deg);
 }
+/* hang：ラック（枠）はその場でフェードし、中の服が掛かって揺れる */
+html[data-reveal-ready="on"] [data-reveal="hang"] {
+  transform: none;
+}
+/* stage：枠は動かさず、中の演出（バーが伸びるなど）のきっかけにだけ使う */
+html[data-reveal-ready="on"] [data-reveal="stage"] {
+  opacity: 1;
+  transform: none;
+}
 html[data-reveal-ready="on"] [data-reveal].is-visible {
   opacity: 1;
   transform: none;
+}
+
+/*
+ * 出現に合わせた演出。どれも html[data-reveal-ready="on"] の下にだけ書くので、
+ * 動きを減らす設定・JS なしでは最初から完成形で表示される
+ */
+
+/* 服がラックに掛かる：上から落ちてフックを支点に揺れ、止まる */
+html[data-reveal-ready="on"] [data-reveal="hang"].is-visible .hanger-item > .garment {
+  transform-origin: 50% 0;
+  animation: hang-on var(--dur-swing) var(--ease-swing) calc(var(--d, 0ms) + var(--lag-hang)) backwards;
+}
+/* 下げ札は糸の分だけ遅れて、ぴらっと返ってから落ち着く */
+html[data-reveal-ready="on"] [data-reveal="hang"].is-visible .hanger-item .hang-tag {
+  animation: tag-flick var(--dur-swing) var(--ease-swing) calc(var(--d, 0ms) + var(--lag-hang) * 2) backwards;
+}
+@keyframes hang-on {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  25% {
+    opacity: 1;
+    transform: rotate(4deg);
+  }
+  50% {
+    transform: rotate(-2.5deg);
+  }
+  72% {
+    transform: rotate(1.2deg);
+  }
+  88% {
+    transform: rotate(-0.4deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes tag-flick {
+  0% {
+    opacity: 0;
+    transform: rotate(14deg);
+  }
+  40% {
+    opacity: 1;
+    transform: rotate(-14deg);
+  }
+  70% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(-8deg);
+  }
+}
+
+/* ステッカーを 1 枚ずつ貼る。傾き（transform）を残すため scale プロパティで動かす */
+html[data-reveal-ready="on"] [data-reveal].is-visible .sticker {
+  animation: sticker-slap var(--dur-ui) var(--ease-out) calc(var(--lag-light) + var(--i, 0) * var(--lag-hang)) backwards;
+}
+@keyframes sticker-slap {
+  0% {
+    opacity: 0;
+    scale: 1.35;
+  }
+  60% {
+    opacity: 1;
+    scale: 0.96;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+/* レーザーの点は、ブロックが出てから照明のように点く */
+html[data-reveal-ready="on"] [data-reveal] .laser-dot {
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity var(--dur-ui) var(--ease-out) calc(var(--d, 0ms) + var(--lag-light)),
+    transform var(--dur-ui) var(--ease-spring) calc(var(--d, 0ms) + var(--lag-light));
+}
+html[data-reveal-ready="on"] [data-reveal].is-visible .laser-dot {
+  opacity: 1;
+  transform: none;
+}
+
+/* 学歴の線：再生ヘッドのように上から「今」へ引かれていく */
+html[data-reveal-ready="on"] [data-reveal] .edu-tree::before {
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform var(--dur-swing) var(--ease-swing) var(--lag-light);
+}
+html[data-reveal-ready="on"] [data-reveal].is-visible .edu-tree::before {
+  transform: none;
+}
+
+/* 研究の比較バー：左から伸び、DQN が先に着く */
+html[data-reveal-ready="on"] [data-reveal="stage"] .race-bar {
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--dur-swing) var(--ease-out);
+}
+html[data-reveal-ready="on"] [data-reveal="stage"] .race-bar.is-dqn {
+  transition-duration: var(--dur-ui);
+}
+html[data-reveal-ready="on"] [data-reveal="stage"].is-visible .race-bar {
+  transform: none;
+}
+
+/* ランウェイの照明：出現したときに 1 度だけレーザーの光が横切る */
+.laser-sweep {
+  position: relative;
+  overflow: clip;
+}
+.laser-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 40%,
+    color-mix(in srgb, var(--laser) 22%, transparent) 50%,
+    transparent 60%
+  );
+  opacity: 0;
+}
+html[data-reveal-ready="on"] .laser-sweep.is-visible::after {
+  animation: laser-sweep var(--dur-sweep) var(--ease-swing) calc(var(--d, 0ms) + var(--lag-light)) both;
+}
+@keyframes laser-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
 }
 
 /* トップへ戻るボタン */
@@ -376,6 +553,20 @@ html[data-reveal-ready="on"] [data-reveal].is-visible {
   box-shadow:
     0 10px 24px rgba(0, 0, 0, 0.5),
     0 0 0 4px var(--laser);
+}
+/* ハンガーはフックの先を支点に揺れる */
+.back-to-top-hanger {
+  transform-origin: 64% 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .back-to-top:hover .back-to-top-hanger {
+    animation: swing var(--dur-swing) var(--ease-swing);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top:hover .back-to-top-hanger {
+    animation: none;
+  }
 }
 /* カラーバリエーションの生地チップ */
 .swatch {
@@ -463,6 +654,54 @@ html[data-reveal-ready="on"] [data-reveal].is-visible {
 .liner-body {
   animation: rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+/* 曲送り：次の曲は右から、前の曲は左から入ってくる */
+.liner-body[data-skip="next"] {
+  animation: skip-next var(--dur-ui) var(--ease-out);
+}
+.liner-body[data-skip="prev"] {
+  animation: skip-prev var(--dur-ui) var(--ease-out);
+}
+@keyframes skip-next {
+  from {
+    opacity: 0;
+    transform: translateX(var(--skip-shift));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes skip-prev {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--skip-shift) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* トラックを開くと、ライナーノーツが引き出されるように中身が出る */
+details[open] > summary + * {
+  animation: rise var(--dur-ui) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* 動きは止め、切り替わったことだけ短いフェードで伝える */
+  .liner-body[data-skip="next"],
+  .liner-body[data-skip="prev"] {
+    animation-name: fade-in;
+  }
+  details[open] > summary + * {
+    animation: none;
+  }
+}
 
 /* 学歴のツリー */
 /* 左の余白 = ウィンドウの内側余白（20px / 32px）+ 点と線のための幅 */
@@ -531,6 +770,35 @@ html[data-reveal-ready="on"] [data-reveal].is-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .edu-dot.is-now {
+    animation: none;
+  }
+}
+
+/* 再生中（NOW）の点：輪が広がって消える。now-pulse を transform/opacity だけで描いたもの */
+.laser-dot.on-air {
+  position: relative;
+}
+.laser-dot.on-air::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--laser);
+  opacity: 0;
+  animation: on-air var(--dur-pulse) var(--ease-out) infinite;
+}
+@keyframes on-air {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .laser-dot.on-air::after {
     animation: none;
   }
 }

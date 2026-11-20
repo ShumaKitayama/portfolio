@@ -32,12 +32,23 @@ export default function About() {
               <p className="mono text-muted">DESIGNER</p>
               <p className="text-[24px] font-extrabold tracking-[-0.036em]">{personalInfo.nameEn}</p>
             </div>
-            <span className="sticker absolute -top-4 -right-3 rotate-[8deg] bg-laser">{personalInfo.age} 歳</span>
-            <span className="sticker absolute top-[38%] -left-4 rotate-[-7deg] bg-[#ffd400]">
+            <span
+              className="sticker absolute -top-4 -right-3 rotate-[8deg] bg-laser"
+              style={{ "--i": 0 } as React.CSSProperties}
+            >
+              {personalInfo.age} 歳
+            </span>
+            <span
+              className="sticker absolute top-[38%] -left-4 rotate-[-7deg] bg-[#ffd400]"
+              style={{ "--i": 1 } as React.CSSProperties}
+            >
               {personalInfo.location}出身
             </span>
-            <span className="sticker absolute top-[72%] -right-2 rotate-[-4deg] bg-ink !text-on-ink flex items-center gap-2">
-              <span className="laser-dot" /> NOW @ ZOZO SRE
+            <span
+              className="sticker absolute top-[72%] -right-2 rotate-[-4deg] bg-ink !text-on-ink flex items-center gap-2"
+              style={{ "--i": 2 } as React.CSSProperties}
+            >
+              <span className="laser-dot on-air" /> NOW @ ZOZO SRE
             </span>
           </div>
 
