@@ -42,7 +42,7 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="fixed top-4 inset-x-0 z-50 px-4 flex justify-center pointer-events-none">
+    <nav className="film-chrome fixed top-4 inset-x-0 z-50 px-4 flex justify-center pointer-events-none">
       <div className="window pointer-events-auto flex items-center gap-1 p-[5px] max-w-full">
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

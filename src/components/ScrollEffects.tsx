@@ -23,6 +23,10 @@ const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 const ENTER_SPAN = 0.6;
 // track：画面の 7 割の高さを再生ヘッドとし、要素のどこまでを通り過ぎたか
 const PLAYHEAD = 0.7;
+// アイリス：セクションの境目が画面中央からこの割合（画面の高さ比）以内にあると縁が暗くなる
+const CUT_SPAN = 0.35;
+// 終幕：ページの最後のこの割合（画面の高さ比）でアイリスが絞られていく
+const END_SPAN = 0.6;
 
 // スクロールの進み具合（0〜1）。data-scroll の値で測り方を変える
 function progressOf(mode: string | undefined, rect: DOMRectReadOnly, vh: number) {
@@ -40,25 +44,22 @@ function progressOf(mode: string | undefined, rect: DOMRectReadOnly, vh: number)
 }
 
 /**
- * ページ全体のスクロール演出をまとめて受け持つ。
- * - [data-reveal]：画面に入ったらフェードイン（--d で遅延）
- *   - "left" / "pop"：横から・ポンと出る
- *   - "hang"：枠はフェードだけ、中の服がラックに掛かって揺れる
- *   - "stage"：枠は動かさず、中の演出（比較バーなど）のきっかけにする
+ * ページ全体の演出（DESIGN.md「シネマティック」）をまとめて受け持つ。
+ * 演出は html[data-motion] の下にだけ書く。属性は layout.tsx の描画前スクリプトが付け、ここで "live" にする。
+ * - 合図（cue）[data-reveal]：画面に入ったら 1 度だけ .is-visible（--d で遅延）
+ *   - 既定：暗がりからフェードアップ / "focus"：ピント送り / "hang"：服が掛かって揺れが収まる / "stage"：中の演出のきっかけ
  * - [data-count]：画面に入ったら数え上げ
- * - [data-scroll]：スクロール位置に連動して --p（0〜1）を書き込む（exit / enter / track / through）
- *   動きは CSS 側（html[data-scroll-ready="on"]）。動きを減らす設定では書き込まない
+ * - カメラ [data-scroll]：スクロール位置に連動して --p（0〜1）を書き込む（exit / enter / track / through）
+ * - 照明（フィルムフレーム）：暗転幕・レターボックス（オープニング）と、シーン転換・終幕のアイリス
  * - 上部の再生バー（スクロール進捗）と、トップへ戻るボタン
  */
 export default function ScrollEffects() {
   const barRef = useRef<HTMLDivElement>(null);
+  const irisRef = useRef<HTMLDivElement>(null);
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const root = document.documentElement;
-    if (!reduced) root.dataset.revealReady = "on";
-
     const targets = document.querySelectorAll<HTMLElement>("[data-reveal], [data-count]");
     if (reduced || typeof IntersectionObserver === "undefined") {
       targets.forEach((el) => el.classList.add("is-visible"));
@@ -85,16 +86,22 @@ export default function ScrollEffects() {
     const root = document.documentElement;
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-scroll]"));
+    // シーンの境目：ヒーローの次からの各セクションの上端
+    const scenes = Array.from(document.querySelectorAll<HTMLElement>("main section[id]"));
     // 画面の近くにある要素だけ毎フレーム計算する
     const active = new Set<HTMLElement>(targets);
     const written = new WeakMap<HTMLElement, string>();
     let linked = !media.matches;
     let frame = 0;
 
-    const write = (el: HTMLElement, value: string) => {
-      if (written.get(el) === value) return;
-      written.set(el, value);
-      el.style.setProperty("--p", value);
+    // 値が変わったときだけ書く
+    const write = (el: HTMLElement, name: string, value: string) => {
+      const key = `${name}=${value}`;
+      if (name === "--p") {
+        if (written.get(el) === key) return;
+        written.set(el, key);
+      }
+      el.style.setProperty(name, value);
     };
 
     // 1 フレームに 1 回：先にまとめて読み、あとでまとめて書く
@@ -105,19 +112,36 @@ export default function ScrollEffects() {
       const max = root.scrollHeight - vh;
       const list = linked ? Array.from(active) : [];
       const values = list.map((el) => progressOf(el.dataset.scroll, el.getBoundingClientRect(), vh).toFixed(3));
+      // アイリス：画面中央にいちばん近い境目ほど縁が暗い。終幕はページの最後で絞る
+      let cut = 0;
+      if (linked) {
+        for (const scene of scenes) {
+          cut = Math.max(cut, 1 - Math.abs(scene.getBoundingClientRect().top - vh / 2) / (vh * CUT_SPAN));
+        }
+      }
+      const end = linked && max > 0 ? clamp01((y - (max - vh * END_SPAN)) / (vh * END_SPAN)) : 0;
 
       if (barRef.current) barRef.current.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
+      if (irisRef.current) {
+        irisRef.current.style.setProperty("--cut", clamp01(cut).toFixed(3));
+        irisRef.current.style.setProperty("--end", end.toFixed(3));
+      }
       setShowTop(y > 640);
-      list.forEach((el, i) => write(el, values[i]));
+      list.forEach((el, i) => write(el, "--p", values[i]));
     };
     const request = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
 
+    // 動きを減らす設定に切り替わったら属性を外し、完成形で止める
     const applyMotionSetting = () => {
       linked = !media.matches;
-      if (linked) root.dataset.scrollReady = "on";
-      else delete root.dataset.scrollReady;
+      if (linked) {
+        root.dataset.motion = "live";
+      } else {
+        delete root.dataset.motion;
+        delete root.dataset.opening;
+      }
       request();
     };
     applyMotionSetting();
@@ -134,7 +158,7 @@ export default function ScrollEffects() {
             } else {
               active.delete(el);
               if (linked) {
-                write(el, progressOf(el.dataset.scroll, entry.boundingClientRect, window.innerHeight).toFixed(3));
+                write(el, "--p", progressOf(el.dataset.scroll, entry.boundingClientRect, window.innerHeight).toFixed(3));
               }
             }
           }
@@ -154,12 +178,19 @@ export default function ScrollEffects() {
       window.removeEventListener("scroll", request);
       window.removeEventListener("resize", request);
       media.removeEventListener("change", applyMotionSetting);
-      delete root.dataset.scrollReady;
     };
   }, []);
 
   return (
     <>
+      {/* フィルムフレーム：暗転幕・レターボックス・アイリス（html[data-motion] のときだけ表示） */}
+      <div className="film-frame" aria-hidden>
+        <div className="film-curtain" />
+        <div className="film-bar is-top" />
+        <div className="film-bar is-bottom" />
+        <div ref={irisRef} className="film-iris" />
+      </div>
+
       {/* 再生バー：どこまで聴いたか（読んだか） */}
       <div className="fixed top-0 inset-x-0 h-[3px] z-[60] pointer-events-none" aria-hidden>
         <div ref={barRef} className="h-full bg-laser origin-left" style={{ transform: "scaleX(0)" }} />

@@ -113,7 +113,7 @@ export default function Career() {
 
         {/* 学歴：縦のツリー（職歴と同じ大きさのウィンドウで見せる） */}
         <div className="mt-16">
-          <h3 className="text-[32px] md:text-[48px] font-extrabold tracking-[-0.045em] leading-[1.1] mb-6" data-reveal="left">
+          <h3 className="text-[32px] md:text-[48px] font-extrabold tracking-[-0.045em] leading-[1.1] mb-6" data-reveal="focus">
             学歴
           </h3>
           <div className="window" data-reveal>
@@ -132,7 +132,7 @@ export default function Career() {
                   <li
                     key={item.date}
                     className="edu-node"
-                    data-reveal="left"
+                    data-reveal
                     style={{ "--d": `${i * 110}ms` } as React.CSSProperties}
                   >
                     <span className={`edu-dot ${isNow ? "is-now" : ""}`} aria-hidden />

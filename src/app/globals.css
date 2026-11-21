@@ -39,7 +39,6 @@
   /* モーション。カーブと長さは既存の演出（ウィンドウ・揺れ・下げ札・now-pulse）から抜き出したもの */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1); /* 出現・ウィンドウの動き */
   --ease-swing: cubic-bezier(0.3, 0, 0.4, 1); /* 吊られた物の揺れ */
-  --ease-spring: cubic-bezier(0.3, 1.6, 0.5, 1); /* 下げ札の跳ね返り */
   --dur-ui: 0.35s; /* ポップアップ・小さな出現 */
   --dur-swing: 1.2s; /* ハンガーの揺れ・線を引く長さ */
   --dur-sweep: 1.6s; /* 光が横切る長さ */
@@ -50,18 +49,48 @@
   /* 曲送りでずらす距離 */
   --skip-shift: 24px;
 
-  /* スクロール連動。--p（0〜1）に掛ける量 */
-  --depth-far: 50vh; /* 奥の層（グリッド）：ほぼ止まって見える */
-  --depth-mid: 32vh; /* 主役（ラック）：ゆっくり遅れて残る */
-  --depth-near: -6vh; /* 手前（カード）：速く抜けていく */
-  --depth-layer: 36px; /* ステッカー・本文・カードの重なりのずれ */
-  --zoom-hero: 0.15; /* ラックが寄ってくる量 */
-  --zoom-from: 0.92; /* 研究パネルが寄る前の大きさ */
-  --title-from: 0.82; /* 大見出しが育つ前の大きさ */
-  --spread-rack: 25%; /* ヒーローの服が左右に分かれる量 */
-  --drift-rack: 28px; /* ラックの服が横に滑る量 */
-  --tilt-rack: 4deg; /* 滑るときの服の傾き */
-  --record-turn: 120deg; /* 写真の縁（ステッチ）が回る量 */
+  /* ===== シネマティック（DESIGN.md） ===== */
+  /* 間：入りは長い減速で「置かれる」。カメラと照明はゆっくり出て、ゆっくり止まる */
+  --ease-film: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-dolly: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-cue: 1.1s; /* 暗がりからのフェードアップ */
+  --dur-focus: 1.4s; /* ピント送り */
+  --dur-house: 0.6s; /* 客電が落ちる（ポップアップの背景） */
+  --dur-house-out: 0.42s; /* 客電が上がる（退場は入場の約 7 割） */
+  --dur-cut: 0.45s; /* 曲送りのシーンチェンジ */
+  --lag-house: 0.12s; /* 照明が落ちてから幕が開くまで */
+  --seq-step: 80ms; /* ポップアップの中身が届く間隔 */
+  --seq-step-skip: 35ms; /* 曲送りのときは詰める */
+
+  /* オープニング（タイトルシークエンス）のタイムライン */
+  --open-curtain: 1.4s; /* 暗転幕が明けるまで */
+  --t-spot: 0.5s; /* スポットが落ちる */
+  --dur-spot: 1.4s;
+  --t-focus: 0.3s; /* ラックにピントが合い始める */
+  --dur-rack-focus: 1.8s;
+  --t-title: 1.3s; /* タイトルカード */
+  --t-bars: 1.7s; /* レターボックスが退く */
+  --dur-bars: 1.1s;
+  --t-house: 2.3s; /* 客電（ナビ・スクロール誘導） */
+
+  /* 照明 */
+  --spot-dim: 0.82; /* スポットの外の暗さ */
+  --cut-dark: 0.55; /* シーン転換のアイリスの暗さ */
+  --iris-dark: 0.7; /* 終幕のアイリスアウト */
+  --fade-out: 0.85; /* ヒーロー退場の暗転 */
+  --blur-focus: 8px; /* ピント送りのボケ */
+  --blur-house: 10px; /* 客電が落ちたときの背景のぼかし */
+  --letterbox: 9vh; /* シネスコの黒帯 */
+  --house-dark: rgba(0, 0, 0, 0.92);
+
+  /* カメラ。--p（0〜1）に掛ける量 */
+  --drift-cue: 14px; /* フェードアップの小さな流れ */
+  --drift-title: 28px; /* 見出しが収まるまでの傾き */
+  --push-in: 0.08; /* 写真への寄り */
+  --track-rack: 32px; /* ラックのレール送り */
+  --track-slack: 0.15; /* 列ごとの遅れ（ハンガーの遊び） */
+  --depth-mid: 32vh; /* 奥の層（ラック）：遅れて残る */
+  --depth-near: -6vh; /* 手前の層（カード）：先に抜ける */
   --fade-near: 1.8; /* 手前の層が消える速さ */
   --fade-cue: 5; /* スクロール誘導が消える速さ */
 }
@@ -233,12 +262,12 @@ dialog.liner:focus,
 dialog.liner:focus-visible {
   outline: none;
 }
+/* 客電が落ちた客席：中央（舞台）だけ少し明るく、上からレーザーの光がかすかに差す */
 dialog.liner::backdrop {
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-}
-dialog.liner[open] {
-  animation: rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  background:
+    radial-gradient(ellipse 45% 30% at 50% 0%, color-mix(in srgb, var(--laser) 10%, transparent), transparent),
+    radial-gradient(ellipse 65% 60% at 50% 50%, rgba(0, 0, 0, 0.6), var(--house-dark));
+  backdrop-filter: blur(var(--blur-house));
 }
 
 .grid-bg {
@@ -247,22 +276,6 @@ dialog.liner[open] {
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 75%);
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* backwards：出現後は通常のスタイルに戻し、スクロール連動の opacity を効かせる */
-.rise {
-  animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 
 /* details の開閉マーカーを消す */
@@ -278,10 +291,6 @@ details[open] .chev {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise {
-    animation: none;
-    opacity: 1;
-  }
   html {
     scroll-behavior: auto;
   }
@@ -356,48 +365,198 @@ details[open] > .track-row {
   }
 }
 
-/* ===== スクロール演出 ===== */
-
-/* JS が動いたときだけ隠す（JS なし・動きを減らす設定では最初から表示） */
-html[data-reveal-ready="on"] [data-reveal] {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms),
-    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms);
-}
-html[data-reveal-ready="on"] [data-reveal="left"] {
-  transform: translateX(-28px);
-}
-html[data-reveal-ready="on"] [data-reveal="pop"] {
-  transform: translateY(16px) scale(0.94) rotate(-1.5deg);
-}
-/* hang：ラック（枠）はその場でフェードし、中の服が掛かって揺れる */
-html[data-reveal-ready="on"] [data-reveal="hang"] {
-  transform: none;
-}
-/* stage：枠は動かさず、中の演出（バーが伸びるなど）のきっかけにだけ使う */
-html[data-reveal-ready="on"] [data-reveal="stage"] {
-  opacity: 1;
-  transform: none;
-}
-html[data-reveal-ready="on"] [data-reveal].is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/*
- * 出現に合わせた演出。どれも html[data-reveal-ready="on"] の下にだけ書くので、
- * 動きを減らす設定・JS なしでは最初から完成形で表示される
+/* ===== シネマティック（DESIGN.md） =====
+ * 演出はすべて html[data-motion] の下にだけ書く。属性は layout.tsx の描画前スクリプトが付ける。
+ * 動きを減らす設定・JS なしでは付かないので、最初から完成形の静止ページになる。
+ * 動かすのは transform（translate / scale / rotate）・opacity・clip-path・filter だけ。
+ *   - 合図（cue）：[data-reveal] が画面に入ったら 1 度だけ
+ *   - カメラ：[data-scroll] の --p（0〜1）。push-in・drift・照明の上がり下がりだけに使う
+ *   - 照明：フィルムフレーム（暗転幕・レターボックス・アイリス）と各シーンのスポット
  */
 
-/* 服がラックに掛かる：上から落ちてフックを支点に揺れ、止まる */
-html[data-reveal-ready="on"] [data-reveal="hang"].is-visible .hanger-item > .garment {
+/* --- フィルムフレーム --- */
+.film-frame > * {
+  display: none;
+  position: fixed;
+  pointer-events: none;
+}
+html[data-motion] .film-frame > * {
+  display: block;
+}
+/* 暗転幕：タイトルシークエンスの最初の黒 */
+.film-curtain {
+  inset: 0;
+  z-index: 80;
+  background: #000;
+  opacity: 0;
+}
+/* レターボックス：シネスコの黒帯。タイトルが出たあと画面の外へ退く */
+.film-bar {
+  left: 0;
+  right: 0;
+  height: var(--letterbox);
+  z-index: 70;
+  background: #000;
+}
+.film-bar.is-top {
+  top: 0;
+  transform: translateY(-100%);
+}
+.film-bar.is-bottom {
+  bottom: 0;
+  transform: translateY(100%);
+}
+/* アイリス：シーンの境目と終幕で画面の縁が暗くなる。--cut / --end は ScrollEffects が書く */
+.film-iris {
+  inset: 0;
+  z-index: 45;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 40%, #000 100%);
+  opacity: max(calc(var(--cut, 0) * var(--cut-dark)), calc(var(--end, 0) * var(--iris-dark)));
+}
+
+/* --- オープニング：タイトルシークエンス（同じセッションで 1 度だけ） --- */
+html[data-opening] .film-curtain {
+  animation: lights-up var(--open-curtain) var(--ease-dolly) backwards;
+}
+html[data-opening] .film-bar {
+  animation: letterbox-in var(--dur-bars) var(--ease-dolly) var(--t-bars) backwards;
+}
+/* ラックにピントが合い、カメラが少し引いて落ち着く */
+html[data-opening] .hero-rack {
+  animation: rack-focus var(--dur-rack-focus) var(--ease-film) var(--t-focus) backwards;
+}
+/* タイトルカード */
+html[data-opening] .hero-card {
+  animation: focus-in var(--dur-focus) var(--ease-film) var(--t-title) backwards;
+}
+/* 客電：スクロール誘導とナビは最後に灯る */
+html[data-opening] .hero-cue,
+html[data-opening] .film-chrome {
+  animation: lights-down var(--dur-cue) var(--ease-film) var(--t-house) backwards;
+}
+@keyframes lights-up {
+  from {
+    opacity: 1;
+  }
+}
+@keyframes lights-down {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes letterbox-in {
+  from {
+    transform: none;
+  }
+}
+@keyframes rack-focus {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+    filter: blur(var(--blur-focus)) brightness(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0) brightness(1);
+  }
+}
+@keyframes focus-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--drift-cue));
+    filter: blur(var(--blur-focus));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+@keyframes cue-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--drift-cue));
+  }
+}
+
+/* --- ヒーロー：スポットライトと退場（exit：画面から出ていく割合） --- */
+/* レーザー色をわずかに含んだ光だまりがラックに落ちる */
+html[data-motion] .hero-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse min(46vw, 420px) min(40vh, 340px) at 50% 30%,
+    color-mix(in srgb, var(--laser) 9%, transparent),
+    transparent
+  );
+  opacity: calc(1 - var(--p, 0));
+}
+html[data-opening] .hero-scene::before {
+  animation: lights-down var(--dur-spot) var(--ease-dolly) var(--t-spot) backwards;
+}
+/* シーンの終わり：暗転 */
+html[data-motion] .hero-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--canvas);
+  opacity: calc(var(--p, 0) * var(--fade-out));
+}
+/* 奥の層：ラックは遅れて残る */
+html[data-motion] .hero-rack {
+  translate: 0 calc(var(--p, 0) * var(--depth-mid));
+}
+/* 手前の層：カードは先に抜けていく */
+html[data-motion] .hero-card {
+  translate: 0 calc(var(--p, 0) * var(--depth-near));
+  opacity: calc(1 - var(--p, 0) * var(--fade-near));
+}
+html[data-motion] .hero-cue {
+  opacity: calc(1 - var(--p, 0) * var(--fade-cue));
+}
+
+/* --- 合図（cue）：暗がりからのフェードアップ --- */
+html[data-motion] [data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--drift-cue));
+  transition:
+    opacity var(--dur-cue) var(--ease-film) var(--d, 0ms),
+    transform var(--dur-cue) var(--ease-film) var(--d, 0ms);
+}
+/* focus：シーン頭の見出しはピント送りで現れる */
+html[data-motion] [data-reveal="focus"] {
+  filter: blur(var(--blur-focus));
+  transition:
+    opacity var(--dur-focus) var(--ease-film) var(--d, 0ms),
+    transform var(--dur-focus) var(--ease-film) var(--d, 0ms),
+    filter var(--dur-focus) var(--ease-film) var(--d, 0ms);
+}
+/* hang：枠はその場で明るくなり、中の服が掛かって揺れる */
+html[data-motion] [data-reveal="hang"] {
+  transform: none;
+}
+/* stage：枠は動かさず、中の演出（比較バーなど）のきっかけにだけ使う */
+html[data-motion] [data-reveal="stage"] {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion] [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* 服がラックに掛かる：上から降りてフックを支点に揺れ、止まる */
+html[data-motion] [data-reveal="hang"].is-visible .hanger-item > .garment {
   transform-origin: 50% 0;
   animation: hang-on var(--dur-swing) var(--ease-swing) calc(var(--d, 0ms) + var(--lag-hang)) backwards;
 }
 /* 下げ札は糸の分だけ遅れて、ぴらっと返ってから落ち着く */
-html[data-reveal-ready="on"] [data-reveal="hang"].is-visible .hanger-item .hang-tag {
+html[data-motion] [data-reveal="hang"].is-visible .hanger-item .hang-tag {
   animation: tag-flick var(--dur-swing) var(--ease-swing) calc(var(--d, 0ms) + var(--lag-hang) * 2) backwards;
 }
 @keyframes hang-on {
@@ -439,51 +598,29 @@ html[data-reveal-ready="on"] [data-reveal="hang"].is-visible .hanger-item .hang-
   }
 }
 
-/* ステッカーを 1 枚ずつ貼る。傾き（transform）を残すため scale プロパティで動かす */
-html[data-reveal-ready="on"] [data-reveal].is-visible .sticker {
-  animation: sticker-slap var(--dur-ui) var(--ease-out) calc(var(--lag-light) + var(--i, 0) * var(--lag-hang)) backwards;
-}
-@keyframes sticker-slap {
-  0% {
-    opacity: 0;
-    scale: 1.35;
-  }
-  60% {
-    opacity: 1;
-    scale: 0.96;
-  }
-  100% {
-    scale: 1;
-  }
-}
-
-/* レーザーの点は、ブロックが出てから照明のように点く */
-html[data-reveal-ready="on"] [data-reveal] .laser-dot {
+/* レーザーの点は、ブロックが明るくなってから照明のように点く（灯りは跳ねない） */
+html[data-motion] [data-reveal] .laser-dot {
   opacity: 0;
-  transform: scale(0.3);
-  transition:
-    opacity var(--dur-ui) var(--ease-out) calc(var(--d, 0ms) + var(--lag-light)),
-    transform var(--dur-ui) var(--ease-spring) calc(var(--d, 0ms) + var(--lag-light));
+  transition: opacity var(--dur-ui) var(--ease-out) calc(var(--d, 0ms) + var(--lag-light) * 2);
 }
-html[data-reveal-ready="on"] [data-reveal].is-visible .laser-dot {
+html[data-motion] [data-reveal].is-visible .laser-dot {
   opacity: 1;
-  transform: none;
 }
 
 /* 研究の比較バー：左から伸び、DQN が先に着く */
-html[data-reveal-ready="on"] [data-reveal="stage"] .race-bar {
+html[data-motion] [data-reveal="stage"] .race-bar {
   transform: scaleX(0);
   transform-origin: 0 50%;
   transition: transform var(--dur-swing) var(--ease-out);
 }
-html[data-reveal-ready="on"] [data-reveal="stage"] .race-bar.is-dqn {
+html[data-motion] [data-reveal="stage"] .race-bar.is-dqn {
   transition-duration: var(--dur-ui);
 }
-html[data-reveal-ready="on"] [data-reveal="stage"].is-visible .race-bar {
+html[data-motion] [data-reveal="stage"].is-visible .race-bar {
   transform: none;
 }
 
-/* ランウェイの照明：出現したときに 1 度だけレーザーの光が横切る */
+/* 走査光：レーザーが舞台を 1 度だけ横切る */
 .laser-sweep {
   position: relative;
   overflow: clip;
@@ -492,6 +629,7 @@ html[data-reveal-ready="on"] [data-reveal="stage"].is-visible .race-bar {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 4;
   pointer-events: none;
   background: linear-gradient(
     100deg,
@@ -501,8 +639,8 @@ html[data-reveal-ready="on"] [data-reveal="stage"].is-visible .race-bar {
   );
   opacity: 0;
 }
-html[data-reveal-ready="on"] .laser-sweep.is-visible::after {
-  animation: laser-sweep var(--dur-sweep) var(--ease-swing) calc(var(--d, 0ms) + var(--lag-light)) both;
+html[data-motion] .laser-sweep.is-visible::after {
+  animation: laser-sweep var(--dur-sweep) var(--ease-dolly) calc(var(--d, 0ms) + var(--dur-cue)) both;
 }
 @keyframes laser-sweep {
   0% {
@@ -519,105 +657,56 @@ html[data-reveal-ready="on"] .laser-sweep.is-visible::after {
   }
 }
 
-/* ===== スクロール連動 =====
- * ScrollEffects が [data-scroll] の要素に進み具合 --p（0〜1）を書き込み、ここで動きに変える。
- * transform を使う既存の演出（出現・揺れ・ホバー）と重ならないよう、
- * translate / scale / rotate の個別プロパティと opacity・clip-path だけを使う。
- * html[data-scroll-ready="on"] の下にだけ書くので、動きを減らす設定・JS なし・未対応ブラウザでは完成形のまま止まる
+/* --- カメラ：スクロール位置そのものがカメラの位置 ---
+ * 出現（transform）や揺れと重ならないよう、translate / scale の個別プロパティを使う
  */
 
-/* ヒーロー（exit：画面から出ていく割合）。奥・主役・手前が別の速さで動き、奥行きが出る */
-html[data-scroll-ready="on"] .hero-scene > .grid-bg {
-  translate: 0 calc(var(--p) * var(--depth-far));
-  opacity: calc(1 - var(--p));
-}
-/* 主役のラックは遅れて残り（ピン留めのように）、こちらへ寄ってくる */
-html[data-scroll-ready="on"] .hero-rack {
-  translate: 0 calc(var(--p) * var(--depth-mid));
-  scale: calc(1 + var(--p) * var(--zoom-hero));
-}
-/* 3 着がバーの上を左右へ滑って分かれる */
-html[data-scroll-ready="on"] .hero-scene .hero-hanger {
-  translate: calc((var(--i) - 1) * var(--p) * var(--spread-rack)) 0;
-}
-/* 手前のカードは速く抜け、小さくなりながら消える */
-html[data-scroll-ready="on"] .hero-card {
-  translate: 0 calc(var(--p) * var(--depth-near));
-  scale: calc(1 - var(--p) * var(--zoom-hero) / 2);
-  opacity: calc(1 - var(--p) * var(--fade-near));
-}
-html[data-scroll-ready="on"] .hero-cue {
-  opacity: calc(1 - var(--p) * var(--fade-cue));
+/* 見出し（enter）：番号とタイトルはわずかに上から、カメラが傾いて収まるように落ち着く。リード文は動かない */
+html[data-motion] [data-scroll="enter"] > .section-title,
+html[data-motion] [data-reveal="focus"][data-scroll="enter"] > p:first-child {
+  translate: 0 calc((var(--p, 1) - 1) * var(--drift-title));
 }
 
-/* 大見出し（enter：下から入って画面の上 4 割に来るまで）。再生ヘッドが走るように左から現れ、育つ */
-html[data-scroll-ready="on"] [data-scroll="enter"] > .section-title {
-  transform-origin: 0 100%;
-  scale: calc(var(--title-from) + (1 - var(--title-from)) * var(--p));
-  clip-path: inset(-0.2em calc((1 - var(--p)) * 100% - 0.2em) -0.2em -0.2em);
-}
-html[data-scroll-ready="on"] [data-scroll="enter"] > .section-title + p {
-  translate: 0 calc((1 - var(--p)) * var(--depth-layer));
-}
-
-/* 自己紹介（through：画面を通り抜ける割合）。写真の縁はレコードのように回り、ステッカーは別々の深さで浮く */
-html[data-scroll-ready="on"] [data-scroll] > .photo-frame {
-  rotate: calc(var(--p) * var(--record-turn));
-}
-/* 中の写真は逆に回して正位置を保つ（回るのはステッチの縁だけ） */
-html[data-scroll-ready="on"] [data-scroll] > .photo-frame > * {
-  rotate: calc(var(--p) * var(--record-turn) * -1);
-}
-html[data-scroll-ready="on"] [data-scroll] > .sticker {
-  translate: 0 calc((0.5 - var(--p)) * (var(--i) + 1) * var(--depth-layer));
+/* 自己紹介（through）：写真へゆっくり寄る（Ken Burns）。縁のステッチとステッカーは動かさない */
+html[data-motion] [data-scroll] > .photo-frame img {
+  scale: calc(1 + var(--p, 0) * var(--push-in));
 }
 
 /* 学歴（track：画面の 7 割の高さを再生ヘッドとして、どこまで読んだか）。線が「今」まで伸びる */
-html[data-scroll-ready="on"] .edu-tree[data-scroll]::before {
+html[data-motion] .edu-tree[data-scroll]::before {
   transform-origin: 50% 0;
-  transform: scaleY(var(--p));
+  transform: scaleY(var(--p, 1));
 }
 
-/* 研究（enter）：パネルが寄ってきて落ち着き、限定の一着はフックから大きくなり、本文は一段遅れて上がる */
-html[data-scroll-ready="on"] .research-panel {
-  scale: calc(var(--zoom-from) + (1 - var(--zoom-from)) * var(--p));
+/* 研究（enter）：はじめは限定の一着にだけスポット。スクロールが進むと客電が上がり、舞台全体が見える */
+html[data-motion] .research-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--spot-x, 50%) var(--spot-y, 200px),
+    transparent 0 120px,
+    var(--house-dark) 380px
+  );
+  opacity: calc((1 - var(--p, 1)) * var(--spot-dim));
 }
-html[data-scroll-ready="on"] .research-panel .research-garment {
-  transform-origin: 50% 0;
-  scale: calc(var(--title-from) + (1 - var(--title-from)) * var(--p));
-}
-html[data-scroll-ready="on"] .research-panel .research-copy {
-  translate: 0 calc((1 - var(--p)) * var(--depth-layer));
+@media (min-width: 1024px) {
+  html[data-motion] .research-panel::before {
+    --spot-x: 200px;
+    --spot-y: 220px;
+  }
 }
 
-/* 制作物（through）：服がバーの上を滑る。列ごとに速さと向きを変え、ラックをめくっているように見せる */
-.rack-slot {
-  --rate: 1;
-}
-.rack-slot:nth-child(even) {
-  --rate: -0.7;
-}
-.rack-slot:nth-child(3n) {
-  --rate: 0.5;
-}
-html[data-scroll-ready="on"] .rack-slot[data-scroll] .hanger-item {
-  translate: calc((var(--p) - 0.5) * var(--rate) * var(--drift-rack)) 0;
-  /* 滑る向きと逆に少し傾く（フックが先に動き、裾が遅れる） */
-  rotate: calc((var(--p) - 0.5) * var(--rate) * var(--tilt-rack) * -1);
+/* 制作物（through）：服がレールの上を同じ向きへわずかに送られる。右の列ほど少し遅れて付いてくる */
+html[data-motion] .rack-slot[data-scroll] .hanger-item {
+  translate: calc((0.5 - var(--p, 0.5)) * var(--track-rack) * (1 - var(--col, 0) * var(--track-slack))) 0;
 }
 
 /* スキル（enter）：メーターのセグメントが下から順に押し上がる。--s はセグメントの番号 */
-html[data-scroll-ready="on"] [data-scroll] .meter .seg.on {
-  scale: 1 calc(0.15 + 0.85 * clamp(0, (var(--p) - var(--s) * 0.12) / 0.4, 1));
-}
-
-/* 連絡先（enter）：カードは別々の深さから重なりに戻り、エンディングの見出しは寄ってくる */
-html[data-scroll-ready="on"] a[data-scroll] {
-  translate: 0 calc((1 - var(--p)) * var(--i) * var(--depth-layer));
-}
-html[data-scroll-ready="on"] [data-scroll] .ending-title {
-  transform-origin: 50% 100%;
-  scale: calc(var(--title-from) + (1 - var(--title-from)) * var(--p));
+html[data-motion] [data-scroll] .meter .seg.on {
+  scale: 1 calc(0.15 + 0.85 * clamp(0, (var(--p, 1) - var(--s) * 0.12) / 0.4, 1));
 }
 
 /* トップへ戻るボタン */
@@ -636,7 +725,7 @@ html[data-scroll-ready="on"] [data-scroll] .ending-title {
   background: var(--surface);
   box-shadow: 0 0 0 1px var(--stone), 0 10px 24px rgba(0, 0, 0, 0.5);
   opacity: 0;
-  transform: translateY(16px) scale(0.8);
+  transform: translateY(16px);
   pointer-events: none;
   transition:
     opacity 0.3s,
@@ -750,24 +839,115 @@ html[data-scroll-ready="on"] [data-scroll] .ending-title {
 .skip-btn:active {
   transform: scale(0.9);
 }
-.liner-body {
-  animation: rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+/* ===== ガーメント・ポップアップ（DESIGN.md 5 章） =====
+ * 開く：客電が落ちる → ウィンドウがピント送りで現れる → 服の台にスポット、服が降りて揺れが収まる → 中身が順に届く
+ * 閉じる：開くの逆。ウィンドウが少しボケて沈み、少し遅れて客電が上がる
+ *   （transition-behavior: allow-discrete に対応したブラウザだけ。それ以外は即座に閉じる）
+ */
+
+/* 服の台：上からのスポット（台の背景に落ちる光）。光は服の後ろに置く */
+.liner-spot {
+  isolation: isolate;
 }
-/* 曲送り：次の曲は右から、前の曲は左から入ってくる */
-.liner-body[data-skip="next"] {
-  animation: skip-next var(--dur-ui) var(--ease-out);
+.liner-spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 70% at 50% 0%, rgba(255, 255, 255, 0.1), transparent 70%);
 }
-.liner-body[data-skip="prev"] {
-  animation: skip-prev var(--dur-ui) var(--ease-out);
+
+/* 閉じた状態の値 = 退場の行き先 */
+html[data-motion] dialog.liner {
+  opacity: 0;
+  transform: translateY(var(--drift-cue));
+  filter: blur(var(--blur-focus));
+  transition:
+    opacity var(--dur-house-out) var(--ease-dolly),
+    transform var(--dur-house-out) var(--ease-dolly),
+    filter var(--dur-house-out) var(--ease-dolly),
+    overlay calc(var(--dur-house-out) + var(--lag-house)) allow-discrete,
+    display calc(var(--dur-house-out) + var(--lag-house)) allow-discrete;
+}
+html[data-motion] dialog.liner::backdrop {
+  opacity: 0;
+  transition:
+    opacity var(--dur-house-out) var(--ease-dolly) var(--lag-house),
+    overlay calc(var(--dur-house-out) + var(--lag-house)) allow-discrete,
+    display calc(var(--dur-house-out) + var(--lag-house)) allow-discrete;
+}
+/* 開く：客電が落ちきる少し前に、ウィンドウがピント送りで現れる（予備動作） */
+html[data-motion] dialog.liner[open] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  animation: focus-in var(--dur-house) var(--ease-film) var(--lag-house) backwards;
+}
+html[data-motion] dialog.liner[open]::backdrop {
+  opacity: 1;
+  animation: lights-down var(--dur-house) var(--ease-dolly) backwards;
+}
+
+/* 中身が届く順番（--q）。段数には上限を設ける */
+dialog.liner {
+  --lag-seq: calc(var(--lag-house) * 2);
+}
+dialog.liner .liner-spot,
+dialog.liner .research-block:nth-child(1) {
+  --q: 1;
+}
+dialog.liner .liner-copy > :nth-child(1),
+dialog.liner .research-block:nth-child(2) {
+  --q: 2;
+}
+dialog.liner .liner-copy > :nth-child(2),
+dialog.liner .research-block:nth-child(n + 3) {
+  --q: 3;
+}
+dialog.liner .liner-copy > :nth-child(3) {
+  --q: 4;
+}
+dialog.liner .liner-copy > :nth-child(4) {
+  --q: 5;
+}
+dialog.liner .liner-copy > :nth-child(n + 5) {
+  --q: 6;
+}
+html[data-motion] dialog.liner[open] :is(.cue, .liner-spot, .liner-copy > *, .research-block) {
+  animation: cue-in var(--dur-house) var(--ease-film) calc(var(--lag-seq) + var(--q, 0) * var(--seq-step)) backwards;
+}
+/* スポットの瞬間：台に光が点き、服がその光の中へ降りてきて揺れが収まる。下げ札は少し遅れて返る */
+html[data-motion] dialog.liner[open] .liner-spot::before {
+  animation: lights-down var(--dur-house) var(--ease-dolly) calc(var(--lag-seq) + var(--q, 0) * var(--seq-step)) backwards;
+}
+html[data-motion] dialog.liner[open] .liner-spot .garment {
+  transform-origin: 50% 0;
+  animation: hang-on var(--dur-swing) var(--ease-swing)
+    calc(var(--lag-seq) + var(--q, 0) * var(--seq-step) + var(--lag-light)) backwards;
+}
+html[data-motion] dialog.liner[open] .liner-spot .hang-tag {
+  animation: tag-flick var(--dur-swing) var(--ease-swing)
+    calc(var(--lag-seq) + var(--q, 0) * var(--seq-step) + var(--lag-light) + var(--lag-hang) * 2) backwards;
+}
+
+/* 曲送り（⏮ / ⏭）＝シーンチェンジ：枠は残し、中身だけが暗がりを経由して送りの向きから入れ替わる。
+ * スポットと服は点き直す。何度も押す操作なので、中の間隔は詰める */
+.liner-body[data-skip] {
+  --lag-seq: 0s;
+  --seq-step: var(--seq-step-skip);
+}
+html[data-motion] dialog.liner[open] .liner-body[data-skip="next"] > :not(.window-bar) {
+  animation: skip-next var(--dur-cut) var(--ease-film) backwards;
+}
+html[data-motion] dialog.liner[open] .liner-body[data-skip="prev"] > :not(.window-bar) {
+  animation: skip-prev var(--dur-cut) var(--ease-film) backwards;
 }
 @keyframes skip-next {
   from {
     opacity: 0;
     transform: translateX(var(--skip-shift));
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 @keyframes skip-prev {
@@ -775,31 +955,11 @@ html[data-scroll-ready="on"] [data-scroll] .ending-title {
     opacity: 0;
     transform: translateX(calc(var(--skip-shift) * -1));
   }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
 }
 
-/* トラックを開くと、ライナーノーツが引き出されるように中身が出る */
-details[open] > summary + * {
-  animation: rise var(--dur-ui) var(--ease-out);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* 動きは止め、切り替わったことだけ短いフェードで伝える */
-  .liner-body[data-skip="next"],
-  .liner-body[data-skip="prev"] {
-    animation-name: fade-in;
-  }
-  details[open] > summary + * {
-    animation: none;
-  }
+/* トラックを開くと、ライナーノーツが暗がりから短く出る（操作への応答なので速く） */
+html[data-motion] details[open] > summary + * {
+  animation: cue-in var(--dur-ui) var(--ease-out);
 }
 
 /* 学歴のツリー */

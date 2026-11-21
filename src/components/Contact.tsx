@@ -24,9 +24,8 @@ export default function Contact() {
               target="_blank"
               rel="noopener noreferrer"
               className="window window-hover p-5 md:p-6 flex flex-col gap-6 group"
-              data-reveal="pop"
-              data-scroll="enter"
-              style={{ "--d": `${i * 100}ms`, "--i": i } as React.CSSProperties}
+              data-reveal
+              style={{ "--d": `${i * 100}ms` } as React.CSSProperties}
             >
               <span className="w-11 h-11 rounded-full bg-ink text-on-ink flex items-center justify-center transition-shadow group-hover:shadow-[0_0_0_4px_var(--laser)]">
                 <link.icon size={20} />
@@ -42,12 +41,12 @@ export default function Contact() {
         </div>
 
         {/* エンディング */}
-        <div className="laser-sweep mt-28 text-center" data-reveal data-scroll="enter">
+        <div className="laser-sweep mt-28 text-center" data-reveal="focus">
           <p className="mono text-muted mb-4 flex items-center justify-center gap-2">
             <span className="laser-dot" />
             END OF COLLECTION
           </p>
-          <p className="ending-title text-[40px] md:text-[80px] font-extrabold tracking-[-0.05em] leading-[1]">
+          <p className="text-[40px] md:text-[80px] font-extrabold tracking-[-0.05em] leading-[1]">
             Thank you for <span className="marker">visiting!</span>
           </p>
           <p className="mt-5 text-[15px] font-bold text-muted">最後まで見てくださり、ありがとうございました。</p>

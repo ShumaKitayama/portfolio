@@ -33,13 +33,31 @@ export const metadata: Metadata = {
   },
 };
 
+/*
+ * 演出の入口（DESIGN.md）。最初の描画の前に html[data-motion] を付け、CSS の演出はすべてこの下に書く。
+ * - 動きを減らす設定・JS なしでは付かない → 最初から完成形の静止ページ
+ * - オープニングは同じセッションで 1 度だけ（data-opening）
+ * - ScrollEffects が動き出すと "live" に変わる。読み込みに失敗したら数秒後に外して完成形へ戻す
+ */
+const motionGate = `(function(){try{
+var d=document.documentElement;
+if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+d.dataset.motion="on";
+try{if(!sessionStorage.getItem("kitayama-lab:opening")){d.dataset.opening="on";sessionStorage.setItem("kitayama-lab:opening","1");}}catch(e){d.dataset.opening="on";}
+setTimeout(function(){if(d.dataset.motion==="on"){delete d.dataset.motion;delete d.dataset.opening;}},6000);
+}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${inter.variable} ${notoSansJp.variable}`}>
+    // data-motion は描画前のスクリプトが付けるので、属性の食い違いの警告を抑える
+    <html lang="ja" className={`${inter.variable} ${notoSansJp.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: motionGate }} />
+      </head>
       <body className="font-sans">{children}</body>
     </html>
   );

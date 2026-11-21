@@ -2,7 +2,7 @@
 
 import { works, type Work } from "@/data/portfolio";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { Garment, HangTag, itemNo, yearOf } from "./Garment";
 import { SectionHeader, Tags } from "./ui";
@@ -36,9 +36,15 @@ type ItemDetailProps = {
 };
 
 function ItemDetail({ work, index, total, onClose, onSkip, skipDir }: ItemDetailProps) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  // 曲送りしたら先頭から見せる（枠は残すので、押したボタンにフォーカスが残る）
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: 0 });
+  }, [index]);
+
   return (
     <div
-      key={index}
+      ref={bodyRef}
       className="window max-h-[88vh] overflow-y-auto liner-body"
       data-skip={skipDir > 0 ? "next" : skipDir < 0 ? "prev" : undefined}
     >
@@ -68,99 +74,102 @@ function ItemDetail({ work, index, total, onClose, onSkip, skipDir }: ItemDetail
         </div>
       </div>
 
-      {/* 画面のスクリーンショット */}
-      {work.shots && work.shots.length > 0 && (
-        <div className="px-6 md:px-8 pt-6 md:pt-8">
-          <p className="mono text-muted mb-3">LOOKBOOK — 実際の画面</p>
-          {/* 複数枚あるときは横に並べる */}
-          <div className={`grid gap-5 items-start ${work.shots.length > 1 ? "md:grid-cols-2" : ""}`}>
-            {work.shots.map((shot) => (
-              <figure
-                key={shot.src}
-                // 縦長（スマホ）の画面は幅を絞って中央に置く
-                className={shot.height > shot.width * 1.4 ? "max-w-[240px] mx-auto" : shot.height > shot.width ? "max-w-[560px] mx-auto" : ""}
-              >
-                <a
-                  href={`${basePath}${shot.src}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shot-frame block"
-                  aria-label={`${shot.alt}（画像を別タブで開く）`}
+      {/* 中身だけを曲ごとに入れ替える（シーンチェンジ） */}
+      <Fragment key={index}>
+        {/* 画面のスクリーンショット */}
+        {work.shots && work.shots.length > 0 && (
+          <div className="cue px-6 md:px-8 pt-6 md:pt-8">
+            <p className="mono text-muted mb-3">LOOKBOOK — 実際の画面</p>
+            {/* 複数枚あるときは横に並べる */}
+            <div className={`grid gap-5 items-start ${work.shots.length > 1 ? "md:grid-cols-2" : ""}`}>
+              {work.shots.map((shot) => (
+                <figure
+                  key={shot.src}
+                  // 縦長（スマホ）の画面は幅を絞って中央に置く
+                  className={shot.height > shot.width * 1.4 ? "max-w-[240px] mx-auto" : shot.height > shot.width ? "max-w-[560px] mx-auto" : ""}
                 >
-                  <span className="shot-bar" aria-hidden>
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                  <Image
-                    src={`${basePath}${shot.src}`}
-                    alt={shot.alt}
-                    width={shot.width}
-                    height={shot.height}
-                    sizes="(min-width: 860px) 800px, 92vw"
-                    className="block w-full h-auto"
-                  />
-                </a>
-                <figcaption className="mt-2 text-[13px] font-medium text-muted">{shot.alt}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="p-6 md:p-8 grid md:grid-cols-[260px_1fr] gap-6 md:gap-10">
-        <div className="relative w-[200px] md:w-full mx-auto md:mx-0 self-start rounded-[13px] bg-canvas px-6 py-5">
-          <Garment cover={work.cover} hanger={false} />
-          <span className="absolute left-4 top-8">
-            <HangTag no={itemNo(index)} sub={yearOf(work.period)} />
-          </span>
-        </div>
-
-        <div className="min-w-0">
-          <StatusLabel status={work.status} />
-          <h3 className="mt-3 text-[28px] md:text-[36px] font-extrabold tracking-[-0.036em] leading-[1.15]">
-            {work.title}
-          </h3>
-          {(work.period || work.team) && (
-            <p className="mono text-muted mt-2">{[work.period, work.team].filter(Boolean).join(" · ")}</p>
-          )}
-
-          <p className="mt-5 text-[15px] font-medium text-graphite prose-ja">{work.description}</p>
-
-          {work.highlights && (
-            <div className="mt-6">
-              <p className="mono text-muted mb-3">POINT</p>
-              <ol className="space-y-[10px]">
-                {work.highlights.map((item, i) => (
-                  <li key={i} className="flex gap-3 text-[14px] font-medium prose-ja">
-                    <span className="mono text-ink pt-[3px] flex-shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ol>
+                  <a
+                    href={`${basePath}${shot.src}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shot-frame block"
+                    aria-label={`${shot.alt}（画像を別タブで開く）`}
+                  >
+                    <span className="shot-bar" aria-hidden>
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <Image
+                      src={`${basePath}${shot.src}`}
+                      alt={shot.alt}
+                      width={shot.width}
+                      height={shot.height}
+                      sizes="(min-width: 860px) 800px, 92vw"
+                      className="block w-full h-auto"
+                    />
+                  </a>
+                  <figcaption className="mt-2 text-[13px] font-medium text-muted">{shot.alt}</figcaption>
+                </figure>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          <div className="mt-6 pt-6 border-t-2 border-stone">
-            <Tags items={work.tech} />
-            {(work.url || work.repo) && (
-              <div className="mt-5 flex flex-wrap gap-2">
-                {work.url && (
-                  <a href={work.url} target="_blank" rel="noopener noreferrer" className="btn">
-                    サイトを見る <span aria-hidden>›</span>
-                  </a>
-                )}
-                {work.repo && (
-                  <a href={work.repo} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
-                    <FaGithub size={13} /> GitHub
-                  </a>
-                )}
+        <div className="p-6 md:p-8 grid md:grid-cols-[260px_1fr] gap-6 md:gap-10">
+          {/* スポットライトの当たる台 */}
+          <div className="liner-spot relative w-[200px] md:w-full mx-auto md:mx-0 self-start rounded-[13px] bg-canvas px-6 py-5">
+            <Garment cover={work.cover} hanger={false} />
+            <span className="absolute left-4 top-8">
+              <HangTag no={itemNo(index)} sub={yearOf(work.period)} />
+            </span>
+          </div>
+
+          <div className="liner-copy min-w-0">
+            <StatusLabel status={work.status} />
+            <h3 className="mt-3 text-[28px] md:text-[36px] font-extrabold tracking-[-0.036em] leading-[1.15]">
+              {work.title}
+            </h3>
+            {(work.period || work.team) && (
+              <p className="mono text-muted mt-2">{[work.period, work.team].filter(Boolean).join(" · ")}</p>
+            )}
+
+            <p className="mt-5 text-[15px] font-medium text-graphite prose-ja">{work.description}</p>
+
+            {work.highlights && (
+              <div className="mt-6">
+                <p className="mono text-muted mb-3">POINT</p>
+                <ol className="space-y-[10px]">
+                  {work.highlights.map((item, i) => (
+                    <li key={i} className="flex gap-3 text-[14px] font-medium prose-ja">
+                      <span className="mono text-ink pt-[3px] flex-shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
             )}
+
+            <div className="mt-6 pt-6 border-t-2 border-stone">
+              <Tags items={work.tech} />
+              {(work.url || work.repo) && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {work.url && (
+                    <a href={work.url} target="_blank" rel="noopener noreferrer" className="btn">
+                      サイトを見る <span aria-hidden>›</span>
+                    </a>
+                  )}
+                  {work.repo && (
+                    <a href={work.repo} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+                      <FaGithub size={13} /> GitHub
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-
+      </Fragment>
     </div>
   );
 }
@@ -199,7 +208,7 @@ export default function Works() {
               className="rack-slot"
               data-reveal="hang"
               data-scroll="through"
-              style={{ "--d": `${(index % 4) * 110}ms` } as React.CSSProperties}
+              style={{ "--d": `${(index % 4) * 110}ms`, "--col": index % 4 } as React.CSSProperties}
             >
               <button
                 onClick={() => open(index)}
@@ -225,7 +234,6 @@ export default function Works() {
       <dialog
         ref={dialogRef}
         className="liner"
-        onClose={() => setSelected(null)}
         onKeyDown={(e) => {
           if (e.key === "ArrowRight") skip(1);
           if (e.key === "ArrowLeft") skip(-1);

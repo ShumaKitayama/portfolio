@@ -53,7 +53,7 @@ export default function Research() {
               </p>
             </div>
 
-            <div className="research-copy min-w-0">
+            <div className="min-w-0">
               <h3 className="text-[26px] md:text-[38px] font-extrabold tracking-[-0.04em] leading-[1.25]">
                 {research.title}
               </h3>
@@ -115,7 +115,7 @@ export default function Research() {
               ESC ×
             </button>
           </div>
-          <div className="px-6 md:px-10 pt-8">
+          <div className="cue px-6 md:px-10 pt-8">
             <p className="mono text-muted mb-2">{research.lab}</p>
             <h3 className="text-[24px] md:text-[34px] font-extrabold tracking-[-0.04em] leading-[1.3]">
               {research.title}

@@ -41,7 +41,7 @@ type SectionHeaderProps = {
 
 export function SectionHeader({ index, label, title, lead }: SectionHeaderProps) {
   return (
-    <div className="mb-12 md:mb-16" data-reveal="left" data-scroll="enter">
+    <div className="mb-12 md:mb-16" data-reveal="focus" data-scroll="enter">
       <p className="mono text-muted mb-4 flex items-center gap-2">
         <span className="laser-dot" />
         {index} / {label}
